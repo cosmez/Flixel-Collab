@@ -1,0 +1,4 @@
+./fcsh-wrap -static-link-runtime-shared-libraries=true -output=build/FlixelCollab.swf src/FlixelCollab.as
+if [ $? -eq 0 ]; then
+	flashplayer build/FlixelCollab.swf
+fi
