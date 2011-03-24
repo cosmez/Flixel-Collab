@@ -2,6 +2,7 @@
 {
 	import org.flixel.*;
 	import collab.*;
+	import collab.storage.GameStorage ;
 
 	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
     [Frame(factoryClass="Preloader")]
@@ -44,10 +45,18 @@
 			ARNE_PALETTE_LIGHT_BLUE:uint  = ARNE_PALETTE_14,
 			ARNE_PALETTE_PALE_BLUE:uint   = ARNE_PALETTE_15;
 		
-		
+		/**
+		 * @private
+		 * 
+		 * The reference to our storage system.  This is initialized during startup of FlixelCollab.
+		 */
+		public var storage:GameStorage ;
 		
         public function FlixelCollab()
         {
+			// Start up the storage system -- has no dependencies on flixel, so it's cool
+			storage = new GameStorage ("FlixelCollabI") ;
+			
 			// Make the game have 400x300 resolution at regular 2x pixel zoom. Start the game in PlayState.
 			super(320, 240, GameSelectState, 2);
 			
@@ -60,5 +69,16 @@
 			// Disable pausing at first since we're going into GameSelectState first.
 			FlxG.pausingEnabled = false;
         }
+		
+		/**
+		 * Call this to get the current instiated storage system.  GameStorage has all you need for saving/loading
+		 * games, setting persistent data values, serializing states, etc.
+		 * 
+		 * @return	Instance of our storage system.
+		 */
+		static public function getStorage():GameStorage
+		{
+			return (FlxG.game as FlixelCollab).storage ;
+		}
     }
 }

@@ -10,6 +10,7 @@ package collab
 	
 	// The games themselves!
 	import example.PlatformerDemoState;
+	import chainedlupine.BeatEmUpState ;
 	
 	
 	
@@ -54,7 +55,9 @@ package collab
 			
 			games[0] = new CollabGameInfo(null, null, "FUCKR", "morganq", "lolLOL");
 			games[1] = new CollabGameInfo(null, null, "Supa-Shmup", "kibo", "Pew! Pew! Pew!");
-			games[2] = new CollabGameInfo(null, null, "Zombie Dating Sim", "skiffles", "Hey, I said that I WASN'T making a game for this.");
+			//games[2] = new CollabGameInfo(null, null, "Zombie Dating Sim", "skiffles", "Hey, I said that I WASN'T making a game for this.");
+			games[2] = new CollabGameInfo(chainedlupine.BeatEmUpState, Resources.GFX_GAME3_ICON, "Beat Em Up", "Chained Lupine", "The president has been kidnapped by ninjas...");
+			games[2].previewImages.push(Resources.GFX_GAME3_PREVIEW1);
 			games[3] = new CollabGameInfo(null, null, "Rainyvania", "Zenka", "Are you a bad enough dude to find the upgrades?");
 			games[4] = new CollabGameInfo(example.PlatformerDemoState, Resources.GFX_GAME1_ICON, "FlxCrawler", "Ace20", "A simple, fun dungeon crawler game!");
 			games[4].previewImages.push(Resources.GFX_GAME1_PREVIEW1);

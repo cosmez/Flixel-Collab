@@ -28,6 +28,11 @@ package collab
 		//[Embed(source = "../game6/Game Icon.png")] public static const GFX_GAME6_ICON :Class;
 		//[Embed(source = "../game6/Game Preview 1.png")] public static const GFX_GAME6_PREVIEW1 :Class;
 		
+		[Embed(source = '../chainedlupine/Game Icon.png')]	public static const GFX_GAME3_ICON: Class ;
+		[Embed(source = '../chainedlupine/Game Preview.png')]	public static const GFX_GAME3_PREVIEW1:Class ;
+		
+		
+		
 		[Embed(source = "fonts/deltaforce_blue_outline_font.png")] public static const GFX_TITLE_FONT :Class;
 		
 		

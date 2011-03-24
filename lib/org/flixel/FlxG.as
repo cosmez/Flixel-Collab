@@ -227,6 +227,14 @@ package org.flixel
 		}
 		
 		/**
+		 * Gets the current game reference.
+		 */
+		static public function get game():FlxGame
+		{
+			return _game ;
+		}
+		
+		/**
 		 * The game and SWF framerate; default is 60.
 		 */
 		static public function get framerate():uint
