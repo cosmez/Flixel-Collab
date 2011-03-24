@@ -13,6 +13,8 @@ package collab
 		private var continueSelected:Boolean;
 		private var transitioning:Boolean;
 		private var firstFrame:Boolean;
+		private var mouseMode:Boolean;
+		private var prevMousePos:FlxPoint;
 		
 		
 		
@@ -41,12 +43,12 @@ package collab
 			
 			continueText = new FlxText(ox, oy + 24, w, "CONTINUE");
 			continueText.setFormat(null, 16, 0xffffff, "center");
-			continueText.solid = false;
+			continueText.solid = true; // True because we have to do overlap on it.
 			add(continueText, true);
 			
 			quitText = new FlxText(ox, continueText.y + 22, w, "QUIT");
 			quitText.setFormat(null, 16, 0xffffff, "center");
-			quitText.solid = false;
+			quitText.solid = true;
 			add(quitText, true);
 			
 			var s:FlxSprite = new FlxSprite(4, FlxG.height - 14, Resources.ImgKeyP);
@@ -77,6 +79,8 @@ package collab
 			overlay.alpha = 0.0;
 			add(overlay, true);
 			
+			prevMousePos = new FlxPoint(0, 0);
+			
 			transitioning = false;
 		}
 		
@@ -88,34 +92,62 @@ package collab
 			
 			if (!transitioning && !firstFrame)
 			{
-				if ( (FlxG.keys.justPressed("DOWN") && continueSelected)
-					|| (FlxG.keys.justPressed("UP") && !continueSelected))
+				// Set mouse mode to true or false.
+				if (!mouseMode && (FlxG.mouse.cursor.x != prevMousePos.x || FlxG.mouse.cursor.y != prevMousePos.y))
 				{
-					FlxG.play(Resources.SFX_MOVE_CURSOR, 0.4);
-					continueSelected = !continueSelected;
+					mouseMode = true;
+					FlxG.mouse.show();
 				}
+				else if (mouseMode && (FlxG.keys.pressed("UP") || FlxG.keys.pressed("DOWN") || FlxG.keys.pressed("ENTER")))
+				{
+					mouseMode = false;
+					FlxG.mouse.hide(); // ideally, FlxG.mouse.show(GFX_MOUSE_INACTIVE);
+				}
+				prevMousePos.x = FlxG.mouse.cursor.x;
+				prevMousePos.y = FlxG.mouse.cursor.y;
 				
-				if (FlxG.keys.justReleased("X") || FlxG.keys.justReleased("ESCAPE") || FlxG.keys.justReleased("P"))
+				// Player input handling.
+				if (mouseMode)
 				{
-					FlxG.pausingEnabled = true;
-					FlxG.pause = false;
-				}
-				else if (FlxG.keys.justReleased("ENTER") || FlxG.keys.justReleased("C"))
-				{
-					if (!continueSelected)
+					if (FlxU.overlap(new FlxObject(FlxG.mouse.cursor.x, FlxG.mouse.cursor.y, 10, 10), continueText, onMouseOverlap))
 					{
-						TweenMax.to(overlay, 0.6, { alpha: 1.0, onComplete: switchToGameSelect } );
-						FlxG.play(Resources.SFX_CONFIRM);
-						transitioning = true;
+						if (!continueSelected)
+						{
+							continueSelected = true;
+							FlxG.play(Resources.SFX_MOVE_CURSOR, 0.4);
+						}
+						if (FlxG.mouse.justPressed()) FlxG.pause = false;
 					}
-					else
+					else if (FlxU.overlap(new FlxObject(FlxG.mouse.cursor.x, FlxG.mouse.cursor.y, 10, 10), quitText, onMouseOverlap))
 					{
-						FlxG.pausingEnabled = true;
+						if (continueSelected)
+						{
+							continueSelected = false;
+							FlxG.play(Resources.SFX_MOVE_CURSOR, 0.4);
+						}
+						if (FlxG.mouse.justPressed()) quitGame();
+					}
+				}
+				else
+				{
+					if ( (FlxG.keys.justPressed("DOWN") && continueSelected)
+						|| (FlxG.keys.justPressed("UP") && !continueSelected))
+					{
+						FlxG.play(Resources.SFX_MOVE_CURSOR, 0.4);
+						continueSelected = !continueSelected;
+					}
+					
+					if (FlxG.keys.justReleased("X") || FlxG.keys.justReleased("ESCAPE") || FlxG.keys.justReleased("P"))
 						FlxG.pause = false;
+					else if (FlxG.keys.justReleased("ENTER") || FlxG.keys.justReleased("C"))
+					{
+						if (!continueSelected) quitGame();
+						else FlxG.pause = false;
 					}
 				}
 			}
 			
+			// Flashing correct text.
 			if (continueSelected)
 			{
 				continueText.color = FlxU.getColor(251, 238, 4);
@@ -132,6 +164,15 @@ package collab
 			}
 			
 			firstFrame = false;
+		}
+		
+		
+		
+		private function quitGame():void
+		{
+			TweenMax.to(overlay, 0.6, { alpha: 1.0, onComplete: switchToGameSelect } );
+			FlxG.play(Resources.SFX_CONFIRM);
+			transitioning = true;
 		}
 		
 		
@@ -160,8 +201,11 @@ package collab
 			transitioning = false;
 			firstFrame = true;
 			continueSelected = true;
-			FlxG.pausingEnabled = false;
+			mouseMode = false;
+			//FlxG.pausingEnabled = false;
 			TweenMax.pauseAll();
+			prevMousePos.x = FlxG.mouse.cursor.x;
+			prevMousePos.y = FlxG.mouse.cursor.y;
 			
 			FlxG.play(Resources.SFX_OPEN_PAUSE);
 		}
@@ -172,6 +216,9 @@ package collab
 		{
 			TweenMax.resumeAll();
 			FlxG.play(Resources.SFX_CANCEL);
+			FlxG.mouse.hide();
 		}
+		
+		private function onMouseOverlap(Object1:FlxObject, Object2:FlxObject):Boolean { return true; }
 	}
 }

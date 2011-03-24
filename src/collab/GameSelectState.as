@@ -9,31 +9,38 @@ package collab
 	import flash.utils.ByteArray;
 	
 	// The games themselves!
-	import ace.PlatformerDemoState;
+	import example.PlatformerDemoState;
 	
 	
 	
 	// The GameSelectState is where the game starts at!
 	public class GameSelectState extends FlxState implements IUnloadable
 	{
-		
 		// Variables
 		private var modProcessor:ModProcessor;
 		public var songVolume:Number;
 		private var startingGame :Boolean;
 		//private var testSprite :FlxSprite;
-		private var games:Vector.<Vector.<CollabGame>>;
+		private var games:Vector.<CollabGameInfo>;
+		private var selectedGame:CollabGameInfo;
 		private var selectedGameIndices:FlxPoint;
-		private var gameButtons:FlxGroup;
+		private var gameIcons:FlxGroup;
+		private var gameIconGrid:Vector.<Vector.<FlxObject>>;
 		
 		// Preview area stuff.
+		private var titleChars:FlxGroup;
+		private var titleCharShadows:FlxGroup;
 		private var gameInfoBoxSprite:FlxSprite;
 		private var gamePreviewSprite:FlxSprite;
 		private var gameNameText:FlxText;
 		private var gameAuthorText:FlxText;
 		private var gameDescriptionText:FlxText;
 		
-		private var selectorSprite:FlxSprite;
+		private var titleAnimCounter:Number = 0;
+		
+		private var selectorSprite:SelectorSprite;
+		private var mouseMode:Boolean = false;
+		private var prevMousePos:FlxPoint;
 		
 		
 		
@@ -43,25 +50,20 @@ package collab
 			FlxG.pausingEnabled = false;
 			
 			// First of all, we make our ArcadeGameObjects.
-			games = new Vector.<Vector.<CollabGame>>(2, true);
-			games[0] = new Vector.<CollabGame>(3, true);
-			games[1] = new Vector.<CollabGame>(3, true);
+			games = new Vector.<CollabGameInfo>(6, true);
 			
-			games[0][0] = new CollabGame(null, "FUCKR", "morganq", "lolLOL");
-			games[0][1] = new CollabGame(null, "Supa-Shmup", "kibo", "Pew! Pew! Pew!");
-			games[0][2] = new CollabGame(null, "Zombie Dating Sim", "skiffles", "Hey, I said that I WASN'T making a game for this.");
-			games[1][0] = new CollabGame(null, "Rainyvania", "Zenka", "Are you a bad enough dude to find the upgrades?");
-			games[1][1] = new CollabGame(ace.PlatformerDemoState, "FlxCrawler", "Ace20", "A simple, fun dungeon crawler game!");
-			games[1][2] = new CollabGame(null, "Eden Planet", "cai", "Natives and monkeys and pirates, oh my!");
+			games[0] = new CollabGameInfo(null, null, "FUCKR", "morganq", "lolLOL");
+			games[1] = new CollabGameInfo(null, null, "Supa-Shmup", "kibo", "Pew! Pew! Pew!");
+			games[2] = new CollabGameInfo(null, null, "Zombie Dating Sim", "skiffles", "Hey, I said that I WASN'T making a game for this.");
+			games[3] = new CollabGameInfo(null, null, "Rainyvania", "Zenka", "Are you a bad enough dude to find the upgrades?");
+			games[4] = new CollabGameInfo(example.PlatformerDemoState, Resources.GFX_GAME1_ICON, "FlxCrawler", "Ace20", "A simple, fun dungeon crawler game!");
+			games[4].previewImages.push(Resources.GFX_GAME1_PREVIEW1);
+			games[5] = new CollabGameInfo(null, null, "Eden Planet", "cai", "Natives and monkeys and pirates, oh my!");
 			
 			selectedGameIndices = new FlxPoint(-1,-1);
 			
 			// Add the scrolling background.
-			var bg:FlxBackdrop = new FlxBackdrop(Resources.GFX_GAME_SELECT_BACKDROP);
-			bg.velocity = new FlxPoint(40, 30);
-			bg.solid = false;
-			//bg.alpha = 0.8;
-			//TweenMax.to(bg, 2.0, { alpha: 0.4, ease:Sine.easeInOut, repeat: -1, yoyo: true } );
+			var bg:FlxBackdrop = new FlxBackdrop(Resources.GFX_GAME_SELECT_BACKDROP, 40, 30, true, true, true);
 			add(bg);
 			
 			// Add in the game info box.
@@ -90,26 +92,67 @@ package collab
 			gameDescriptionText.solid = false;
 			add(gameDescriptionText);
 			
-			// Make buttons for each game!
-			gameButtons = new FlxGroup();
-			var bOffset:FlxPoint = new FlxPoint(12, 33);
-			gameButtons.add(new FlxSprite(bOffset.x, bOffset.y, Resources.GFX_GAME1_ICON), true);
-			gameButtons.add(new FlxSprite(bOffset.x + 80 + 8, bOffset.y, Resources.GFX_GAME2_ICON), true);
-			gameButtons.add(new FlxSprite(bOffset.x, bOffset.y + 60 + 8, Resources.GFX_GAME3_ICON), true);
-			gameButtons.add(new FlxSprite(bOffset.x + 80 + 8, bOffset.y + 60 + 8, Resources.GFX_GAME4_ICON), true);
-			gameButtons.add(new FlxSprite(bOffset.x, bOffset.y + 120 + 16, Resources.GFX_GAME5_ICON), true);
-			gameButtons.add(new FlxSprite(bOffset.x + 80 + 8, bOffset.y + 120 + 16, Resources.GFX_GAME6_ICON), true);
-			add(gameButtons);
+			// Make icons for each game!
+			gameIconGrid = new Vector.<Vector.<FlxObject>>(2);
+			gameIconGrid[0] = new Vector.<FlxObject>(3);
+			gameIconGrid[1] = new Vector.<FlxObject>(3);
+			gameIcons = new FlxGroup();
 			
-			// Add the logo text ("Flixel Arcade!").
-			var logoText:FlxText = new FlxText(0, 4, FlxG.width, "Flixel Collab!");
-			logoText.setFormat(null, 16, FlxU.getColor(192, 192, 255), "center", FlxU.getColor(0, 0, 0, 0.5));
-			logoText.shadow = 1;
-			logoText.solid = false;
-			add(logoText);
+			var iconOffset:FlxPoint = new FlxPoint(12, 33);
+			for (var i:int = 0; i < games.length; i++)
+			{
+				var curGameInfo:CollabGameInfo = games[i];
+				if (curGameInfo == null) continue;
+				
+				var icon:FlxSprite;
+				if (curGameInfo.iconImage != null)
+					icon = new FlxSprite(iconOffset.x + ((80 + 8) * (i % 2)), iconOffset.y + ((60 + 8) * int(i / 2)), curGameInfo.iconImage);
+				else
+					icon = new FlxSprite(iconOffset.x + ((80 + 8) * (i % 2)), iconOffset.y + ((60 + 8) * int(i / 2)), Resources.GFX_NO_GAME_ICON);
+				
+				gameIcons.add(icon);
+				gameIconGrid[i % 2][int(i / 2)] = icon;
+			}
+			add(gameIcons);
+			
+			// Add the title text ("Flixel Collab!").
+			var titleFont:FlxCaiBitmapFont = new FlxCaiBitmapFont(Resources.GFX_TITLE_FONT, 16, 17, 0, 0, FlxBitmapFont.TEXT_SET4 + ".:;!?\''()");
+			titleChars = new FlxGroup();
+			titleCharShadows = new FlxGroup();
+			
+			var titleString:String = "FLIXEL COLLAB!";
+			var titleOffset:int = (FlxG.width - (titleString.length * 16)) / 2;
+			for (i = 0; i < titleString.length; i++)
+			{
+				var char:String = titleString.charAt(i);
+				var charSprite:FlxBitmapText = new FlxBitmapText(titleOffset + (16 * i), 8, titleFont, char);
+				titleChars.add(charSprite, true);
+				charSprite = new FlxBitmapText(titleOffset + (16 * i) + 1, 8, titleFont, char);
+				charSprite.colorFont = false;
+				charSprite.color = FlxU.getColor(24, 36, 48);
+				titleCharShadows.add(charSprite, true);
+			}
+			add(titleCharShadows);
+			add(titleChars);
+			
+			//var titleText:FlxBitmapFont = new FlxBitmapFont(Resources.GFX_TITLE_FONT, 16, 16, FlxBitmapFont.TEXT_SET4, 20, 0, 1);
+			//titleText.width = FlxG.width;
+			//titleText.setText("WOO HEY TESTING");
+			//titleText.align = FlxBitmapFont.ALIGN_RIGHT;
+			
+			//var titleFont:org.flixel.cai.FlxBitmapFont = new org.flixel.cai.FlxBitmapFont(Resources.GFX_TITLE_FONT, 16, 17, 0, 0, org.flixel.FlxBitmapFont.TEXT_SET4);
+			//var titleText:FlxBitmapText = new FlxBitmapText(0, 0, titleFont, "WOO! ALRIGHT SWEET!", "center", 0);
+			//titleText.colorFont = true;
+			//add(titleText);
+			
+			//var logoText:FlxText = new FlxText(0, 4, FlxG.width, "Flixel Collab!");
+			//logoText.setFormat(null, 16, FlxU.getColor(192, 192, 255), "center", FlxU.getColor(0, 0, 0, 0.5));
+			//logoText.shadow = 1;
+			//logoText.solid = false;
+			//add(logoText);
 			
 			// Add the selector sprite.
-			selectorSprite = new FlxSprite(0, 0, Resources.GFX_GAME_SELECTOR);
+			selectorSprite = new SelectorSprite(0, 0, gameIconGrid[0][0].width, gameIconGrid[0][0].height);
 			add(selectorSprite);
 			
 			// Update game selection.
@@ -123,59 +166,135 @@ package collab
 			playSong();
 			
 			startingGame = false;
-			FlxG.mouse.show();
+			prevMousePos = new FlxPoint(-1, -1);
+			
+			FlxG.mouse.show(); // gotta do this to instantiate the mouse graphic.
+			FlxG.mouse.hide();
 		}
 		
 		
 		
 		override public function update():void
 		{
-			selectorSprite.alpha = 0.7 + (Math.random() * 0.3);
+			super.update();
+			
+			titleAnimCounter += FlxG.elapsed;
+			
+			for (var i:int = 0; i < titleChars.members.length; i++)
+			{
+				var curCharSprite:FlxObject = titleChars.members[i] as FlxObject;
+				//var curCharSprite:org.flixel.cai.FlxBitmapFont = titleChars.members[i] as org.flixel.cai.FlxBitmapFont;
+				curCharSprite.y = 8 + (4 * Math.sin((titleAnimCounter * 4) + (i * 0.4)));
+				
+				(titleCharShadows.members[i] as FlxObject).y = curCharSprite.y + 1;
+			}
+			
+			//selectorSprite.alpha = 0.7 + (Math.random() * 0.3);
 			
 			if (!startingGame)
 			{
-				if (FlxG.keys.justPressed("LEFT") && selectedGameIndices.x > 0)
+				// Set mouse mode to true or false.
+				if (!mouseMode && prevMousePos.x != -1 && (FlxG.mouse.cursor.x != prevMousePos.x || FlxG.mouse.cursor.y != prevMousePos.y))
 				{
-					selectedGameIndices.x--;
-					updateSelectedGame();
+					mouseMode = true;
+					FlxG.mouse.show();
 				}
-				if (FlxG.keys.justPressed("RIGHT") && selectedGameIndices.x < games.length - 1)
+				else if (mouseMode && (FlxG.keys.pressed("UP") || FlxG.keys.pressed("DOWN") || FlxG.keys.pressed("LEFT") || FlxG.keys.pressed("RIGHT") || FlxG.keys.pressed("ENTER")))
 				{
-					selectedGameIndices.x++;
-					updateSelectedGame();
+					mouseMode = false;
+					FlxG.mouse.hide(); // ideally, FlxG.mouse.show(GFX_MOUSE_INACTIVE);
 				}
-				if (FlxG.keys.justPressed("UP") && selectedGameIndices.y > 0)
+				prevMousePos.x = FlxG.mouse.cursor.x;
+				prevMousePos.y = FlxG.mouse.cursor.y;
+
+				// Update screen based on player input.
+				if (mouseMode)
 				{
-					selectedGameIndices.y--;
-					updateSelectedGame();
+					if (FlxU.overlap(new FlxObject(FlxG.mouse.cursor.x, FlxG.mouse.cursor.y, 10, 10), gameIcons, onMouseOverlap))
+					{
+						// Mouse is overlapping an icon.
+						updateSelectedGame();
+						if (FlxG.mouse.justPressed()) startGame();
+					}
 				}
-				if (FlxG.keys.justPressed("DOWN") && selectedGameIndices.y < games[0].length - 1)
+				else
 				{
-					selectedGameIndices.y++;
-					updateSelectedGame();
-				}
-				
-				if (FlxG.keys.justPressed("ENTER") && games[selectedGameIndices.x][selectedGameIndices.y].gameClass != null)
-				{
-					FlxG.fade.start(0xff000000, 0.6, null, true);
-					TweenMax.to(this, 0.6, { songVolume: 0.0, onUpdate: updateSongVolume, onComplete: startGame } );
-					startingGame = true;
-					FlxG.play(Resources.SFX_CONFIRM);
+					if (FlxG.keys.justPressed("LEFT") && selectedGameIndices.x > 0)
+					{
+						selectedGameIndices.x--;
+						updateSelectedGame();
+					}
+					if (FlxG.keys.justPressed("RIGHT") && selectedGameIndices.x < gameIconGrid.length - 1)
+					{
+						selectedGameIndices.x++;
+						updateSelectedGame();
+					}
+					if (FlxG.keys.justPressed("UP") && selectedGameIndices.y > 0)
+					{
+						selectedGameIndices.y--;
+						updateSelectedGame();
+					}
+					if (FlxG.keys.justPressed("DOWN") && selectedGameIndices.y < gameIconGrid[0].length - 1)
+					{
+						selectedGameIndices.y++;
+						updateSelectedGame();
+					}
+					
+					if (FlxG.keys.justPressed("ENTER")) startGame();
 				}
 			}
+		}
+		
+		
+		
+		// Handles overlapping of mouse and icons.
+		public function onMouseOverlap(Object1:FlxObject, Object2:FlxObject):Boolean
+		{
+			var foundIcon:Boolean = false;
+			for (var i:int = 0; i < gameIconGrid.length; i++)
+			{
+				for (var j:int = 0; j < gameIconGrid[0].length; j++)
+				{
+					var curIcon:FlxObject = gameIconGrid[i][j];
+					if (curIcon === Object2)
+					{
+						selectedGameIndices.x = i;
+						selectedGameIndices.y = j;
+						foundIcon = true;
+						break;
+					}
+				}
+				
+				if (foundIcon) break;
+			}
 			
-			super.update();
+			return true;
 		}
 		
 		
 		
 		private function startGame():void
 		{
-			var game:CollabGame = games[selectedGameIndices.x][selectedGameIndices.y];
+			if (games[(selectedGameIndices.y * gameIconGrid.length) + selectedGameIndices.x].gameClass == null) return;
+			
+			FlxG.fade.start(0xff000000, 0.6, null, true); // Can't do a fade in the final one
+			TweenMax.to(this, 0.6, { songVolume: 0.0, onUpdate: updateSongVolume, onComplete: switchState } );
+			startingGame = true;
+			selectorSprite.innerSpeed *= 8;
+			selectorSprite.outerSpeed *= 2;
+			selectorSprite.shouldFlash = true;
+			FlxG.play(Resources.SFX_CONFIRM);
+		}
+		
+		
+		
+		private function switchState():void
+		{
+			var gameClass:Class = games[(selectedGameIndices.y * gameIconGrid.length) + selectedGameIndices.x].gameClass;
 			FlxG.pausingEnabled = true;
 			unload();
 			FlxG.mouse.hide();
-			FlxG.state = new game.gameClass();
+			FlxG.state = new gameClass();
 		}
 		
 		
@@ -192,12 +311,20 @@ package collab
 				instantSwitch = true;
 			}
 
-			gameNameText.text = games[selectedGameIndices.x][selectedGameIndices.y].name;
-			gameAuthorText.text = "By: " + games[selectedGameIndices.x][selectedGameIndices.y].author;
-			gameDescriptionText.text = games[selectedGameIndices.x][selectedGameIndices.y].description;
+			var gameInfo:CollabGameInfo = games[(selectedGameIndices.y * gameIconGrid.length) + selectedGameIndices.x];
+			if (gameInfo == selectedGame) return;
 			
-			selectorSprite.x = (gameButtons.members[(selectedGameIndices.y * games.length) + (selectedGameIndices.x % games.length)] as FlxSprite).x - 4;
-			selectorSprite.y = (gameButtons.members[(selectedGameIndices.y * games.length) + (selectedGameIndices.x % games.length)] as FlxSprite).y - 4;
+			selectedGame = gameInfo;
+			gameNameText.text = selectedGame.name;
+			gameAuthorText.text = "By: " + selectedGame.author;
+			gameDescriptionText.text = selectedGame.description;
+			if (gameInfo.previewImages != null && selectedGame.previewImages.length != 0 && selectedGame.previewImages[0] != null)
+				gamePreviewSprite.loadGraphic(selectedGame.previewImages[0]);
+			else
+				gamePreviewSprite.loadGraphic(Resources.GFX_NO_GAME_PREVIEW);
+			
+			selectorSprite.x = gameIconGrid[selectedGameIndices.x][selectedGameIndices.y].x;// - 4;
+			selectorSprite.y = gameIconGrid[selectedGameIndices.x][selectedGameIndices.y].y;// - 4;
 			
 			if (!instantSwitch) FlxG.play(Resources.SFX_MOVE_CURSOR, 0.6);
 		}
@@ -239,12 +366,7 @@ package collab
 		public function unload():void
 		{
 			//testSprite = null;
-			games[0][0] = null;
-			games[0][1] = null;
-			games[0][2] = null;
-			games[1][0] = null;
-			games[1][1] = null;
-			games[1][2] = null;
+			for (var i:int = 0; i < games.length; i++) { games[i] = null; gameIconGrid[i % 2][int(i / 2)] = null; }
 			games = null;
 			
 			//TweenMax.killTweensOf(modProcessor.soundChannel.soundTransform, true, { volume:0.0 } );

@@ -3,15 +3,49 @@
 	import org.flixel.*;
 	import collab.*;
 
-	// Make the SWF display with a width of 640x480.
-	
-	//[SWF(width = "600", height = "600", backgroundColor = "#000022")]
 	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
-	// Set Preloader class name.
     [Frame(factoryClass="Preloader")]
 
     public class FlixelCollab extends FlxGame
     {
+		public static const
+			ARNE_PALETTE_0:uint  = FlxU.getColor(  0,   0,   0), // BLACK
+			ARNE_PALETTE_1:uint  = FlxU.getColor(157, 157, 157), // GREY
+			ARNE_PALETTE_2:uint  = FlxU.getColor(255, 255, 255), // WHITE
+			ARNE_PALETTE_3:uint  = FlxU.getColor(190,  38,  51), // RED
+			ARNE_PALETTE_4:uint  = FlxU.getColor(224, 111, 139), // PINK
+			ARNE_PALETTE_5:uint  = FlxU.getColor( 73,  60,  43), // DARK BROWN
+			ARNE_PALETTE_6:uint  = FlxU.getColor(164, 100,  34), // BROWN
+			ARNE_PALETTE_7:uint  = FlxU.getColor(235, 137,  49), // ORANGE
+			ARNE_PALETTE_8:uint  = FlxU.getColor(247, 226, 107), // PALE YELLOW
+			ARNE_PALETTE_9:uint  = FlxU.getColor( 47,  72,  78), // TEAL
+			ARNE_PALETTE_10:uint = FlxU.getColor( 68, 137,  26), // GREEN
+			ARNE_PALETTE_11:uint = FlxU.getColor(163, 206,  39), // LIGHT GREEN
+			ARNE_PALETTE_12:uint = FlxU.getColor( 27,  38,  50), // DARK BLUE
+			ARNE_PALETTE_13:uint = FlxU.getColor(  0,  87, 132), // BLUE
+			ARNE_PALETTE_14:uint = FlxU.getColor( 49, 162, 242), // LIGHT BLUE
+			ARNE_PALETTE_15:uint = FlxU.getColor(178, 220, 239); // PALE BLUE
+		
+		public static const
+			ARNE_PALETTE_BLACK:uint  	  = ARNE_PALETTE_0,
+			ARNE_PALETTE_GREY:uint  	  = ARNE_PALETTE_1,
+			ARNE_PALETTE_WHITE:uint  	  = ARNE_PALETTE_2,
+			ARNE_PALETTE_RED:uint  		  = ARNE_PALETTE_3,
+			ARNE_PALETTE_PINK:uint  	  = ARNE_PALETTE_4,
+			ARNE_PALETTE_DARK_BROWN:uint  = ARNE_PALETTE_5,
+			ARNE_PALETTE_BROWN:uint  	  = ARNE_PALETTE_6,
+			ARNE_PALETTE_ORANGE:uint	  = ARNE_PALETTE_7,
+			ARNE_PALETTE_PALE_YELLOW:uint = ARNE_PALETTE_8,
+			ARNE_PALETTE_TEAL:uint  	  = ARNE_PALETTE_9,
+			ARNE_PALETTE_GREEN:uint 	  = ARNE_PALETTE_10,
+			ARNE_PALETTE_LIGHT_GREEN:uint = ARNE_PALETTE_11,
+			ARNE_PALETTE_DARK_BLUE:uint   = ARNE_PALETTE_12,
+			ARNE_PALETTE_BLUE:uint 		  = ARNE_PALETTE_13,
+			ARNE_PALETTE_LIGHT_BLUE:uint  = ARNE_PALETTE_14,
+			ARNE_PALETTE_PALE_BLUE:uint   = ARNE_PALETTE_15;
+		
+		
+		
         public function FlixelCollab()
         {
 			// Make the game have 400x300 resolution at regular 2x pixel zoom. Start the game in PlayState.
