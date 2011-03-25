@@ -1,5 +1,9 @@
 package collab.storage
 {
+	import mx.utils.ObjectUtil ;
+	import flash.net.registerClassAlias;
+	import flash.utils.ByteArray;
+	
 	import org.flixel.*;
 	
 	/**
@@ -13,6 +17,9 @@ package collab.storage
 	 * 
 	 * Folders are used by the Flixel Collab game system to keep track of states for each seperate game.  All
 	 * public Flixel Collab settings are stored in the folder named "Collab".
+	 * 
+	 * You can also store what is called GameData objects.  These are complete classes which can hold an entire
+	 * game's worth of state information, including objects that can be saved to disk along with the rest!
 	 * 
 	 * @author David Grace
 	 */
@@ -85,6 +92,65 @@ package collab.storage
 		}
 
 		/**
+		 * Registers a new GameData class with this storage system.
+		 * 
+		 * Required so that it will become an ISerializable.
+		 */
+		public function registerGameData (gameData:*):void
+		{
+			registerClassAlias (FlxU.getClassName (gameData), gameData) ;
+		}
+		
+		/**
+		 * This saves a GameData class into our storage system.
+		 */
+		public function writeGameData(gameData:*):Boolean
+		{
+			if (_save)
+			{
+				var buffer:ByteArray = new ByteArray ;
+				buffer.writeObject (gameData) ;
+				// No point in compressing for local storage, as AMF3 format is already zlib compressed
+				//buffer.compress () ;
+				buffer.position = 0 ;
+				return (writeData (FlxU.getClassName (gameData), buffer)) ;
+			} else
+				return false ;
+		}
+		
+		/**
+		 * Reads back a GameData class.  Note that you can enforce a particular version by passing in one.  However,
+		 * it isn't strictly necessary as the ctor runs for the GameData class before it is loaded, so it should already
+		 * contain sane values.  But it might be necessary to ignore a GameData of an older version in case there has
+		 * been a re-interpretation of the data that it stores.  Either way, your call.
+		 */
+		public function readGameData(gameDataClass:*, versionRequired:String = "1.0"):*
+		{
+			if (_save)
+			{
+				var buffer:ByteArray = ByteArray (readData (FlxU.getClassName (gameDataClass))) ;
+				if (buffer)
+				{
+					// No point in compressing for local storage, as AMF3 format is already zlib compressed
+					//buffer.uncompress() ;
+					var classReference:* = FlxU.getClass (FlxU.getClassName (gameDataClass)) ;
+					var gameData:* = classReference (buffer.readObject()) ;
+					// Check our version number to make sure they match
+					if ((gameData as GameData).version == versionRequired)
+						return gameData ;  // Yippe!  Pass it back...
+					else
+					{
+						FlxG.log ("GameStorage::readGameData version mismatch!  Expected " + versionRequired + ", received " + (gameData as GameData).version) ;
+						return new classReference ;  // ...otherwise return a newly instantiated version
+					}
+				} else
+					return null ;
+			} else
+				return null ;
+		}
+		
+	
+		/**
 		 * Deeper, internal-ish function that reads data from a specific folder in the save.
 		 */
 		public function readDataFolder (folderName:String, dataName:String):*
@@ -123,6 +189,31 @@ package collab.storage
 				return false ;
 		}
 		
+		/**
+		 * Helper function that simply adds an object of any type to a TrackedList.  Static so this can be called
+		 * anywhere.  (Such as inside the object itself.)
+		 */
+		static public function addToTrackedList (list:TrackedList, what:*, dataClass:*):void
+		{
+			if (!dataClass is GenericData)
+			{
+				throw new Error ("GameStorage::addToTrackedList: We can only add GenericData descendants to the tracking list!") ;
+				return ;
+			}
+			list.addItem (FlxU.getClassName (what), dataClass, (dataClass as GenericData).uuid) ;
+		}
+
+		/**
+		 * Helper function that removes an object from a TrackedList.  Static so that this can be called anywhere.
+		 */
+		static public function removeFromTrackedList (list:TrackedList, what:GenericData):void
+		{
+			list.removeItem (what.uuid) ;
+		}
+		
+		/**
+		 * Helper function that just builds a dot-delimited path for accessing FlxSave properties.
+		 */
 		protected function getPath(folderName:String, dataName:String):String
 		{
 			if (folderName)

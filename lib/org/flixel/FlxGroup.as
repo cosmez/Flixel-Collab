@@ -427,7 +427,7 @@ package org.flixel
 		/**
 		 * Internal function that calls kill on all members.
 		 */
-		protected function killMembers():void
+		public function killMembers():void
 		{
 			var i:uint = 0;
 			var o:FlxObject;
