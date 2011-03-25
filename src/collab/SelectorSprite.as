@@ -38,8 +38,7 @@ package collab
 		
 		
 		
-		// Yeah have fun figuring this out
-		override public function render():void
+		override public function update():void
 		{
 			if (shouldFlash)
 			{
@@ -65,7 +64,13 @@ package collab
 			_outerTravelDist = _outerTravelDist + (outerSpeed * FlxG.elapsed);
 			if (_outerTravelDist < 0) _outerTravelDist += outerPerimeter;
 			if (_outerTravelDist >= outerPerimeter) _outerTravelDist -= outerPerimeter;
-			
+		}
+		
+		
+		
+		// Yeah have fun figuring this out
+		override public function render():void
+		{	
 			// Yellow flashing outline.
 			if (!shouldFlash || _flash)
 			{
@@ -78,6 +83,9 @@ package collab
 			}
 			
 			var curTravelDist:int;
+			
+			var innerPerimeter:uint = 2 * (width + height + 2*((2*2) - 1));
+			var outerPerimeter:uint = 2 * (width + height + 2 * ((2 * 3) - 1));
 			
 			// Inner moving lines.
 			for (var i:int = 0; i < innerSegmentsCount; i++)

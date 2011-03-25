@@ -19,6 +19,7 @@ package org.flixel.data
 		public function FlxPause()
 		{
 			super();
+			
 			scrollFactor.x = 0;
 			scrollFactor.y = 0;
 			var w:uint = 80;
@@ -56,7 +57,7 @@ package org.flixel.data
 			s.solid = false;
 			add(s,true);
 			
-			add(new FlxText(16,78,w-16,"Sound Up"),true);
+			add(new FlxText(16, 78, w - 16, "Sound Up"), true);
 		}
 	}
 }

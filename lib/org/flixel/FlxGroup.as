@@ -440,14 +440,19 @@ package org.flixel
 			}
 		}
 		
+		
+		
+		// I COMMENTED THIS OUT BECAUSE IT'S INCONSISTENT WITH RESET()
 		/**
 		 * Calls kill on the group and all its members.
 		 */
+		/*
 		override public function kill():void
 		{
 			killMembers();
 			super.kill();
 		}
+		*/
 		
 		/**
 		 * Internal function that actually loops through and destroys each member.
@@ -477,7 +482,8 @@ package org.flixel
 		}
 		
 		/**
-		 * If the group's position is reset, we want to reset all its members too.
+		 * If the group's position is reset, we want to move all its members (but not actually reset them).
+		 * If you want to reset the members, use resetMembers().
 		 * 
 		 * @param	X	The new X position of this object.
 		 * @param	Y	The new Y position of this object.
@@ -488,43 +494,62 @@ package org.flixel
 			super.reset(X,Y);
 			var mx:Number;
 			var my:Number;
-			var moved:Boolean = false;
 			if((x != _last.x) || (y != _last.y))
 			{
-				moved = true;
 				mx = x - _last.x;
 				my = y - _last.y;
 			}
+			else return;
+			
 			var i:uint = 0;
 			var o:FlxObject;
 			var ml:uint = members.length;
 			while(i < ml)
 			{
 				o = members[i++] as FlxObject;
-				if((o != null) && o.exists)
+				if(o != null && o.exists)
 				{
-					if(moved)
+					if(o._group)
+						o.reset(o.x+mx,o.y+my);
+					else
 					{
-						if(o._group)
-							o.reset(o.x+mx,o.y+my);
-						else
+						o.x += mx;
+						o.y += my;
+						if(solid)
 						{
-							o.x += mx;
-							o.y += my;
-							if(solid)
-							{
-								o.colHullX.width += ((mx>0)?mx:-mx);
-								if(mx < 0)
-									o.colHullX.x += mx;
-								o.colHullY.x = x;
-								o.colHullY.height += ((my>0)?my:-my);
-								if(my < 0)
-									o.colHullY.y += my;
-								o.colVector.x += mx;
-								o.colVector.y += my;
-							}
+							o.colHullX.width += ((mx>0)?mx:-mx);
+							if(mx < 0)
+								o.colHullX.x += mx;
+							o.colHullY.x = x;
+							o.colHullY.height += ((my>0)?my:-my);
+							if(my < 0)
+								o.colHullY.y += my;
+							o.colVector.x += mx;
+							o.colVector.y += my;
 						}
 					}
+				}
+			}
+		}
+		
+		/**
+		 * If the group's position is reset, we want to reset all its members too.
+		 * 
+		 * @param	X	The new X position of this object.
+		 * @param	Y	The new Y position of this object.
+		 */
+		public function resetMembers():void
+		{
+			var i:uint = 0;
+			var o:FlxObject;
+			var ml:uint = members.length;
+			while(i < ml)
+			{
+				o = members[i++] as FlxObject;
+				if (o != null)
+				{
+					if (o._group) (o as FlxGroup).resetMembers(); // && o.exists?
+					else o.reset(o.x, o.y);
 				}
 			}
 		}
