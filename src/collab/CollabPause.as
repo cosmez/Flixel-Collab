@@ -15,6 +15,7 @@ package collab
 		private var firstFrame:Boolean;
 		private var mouseMode:Boolean;
 		private var prevMousePos:FlxPoint;
+		private var fadeWipe:FlxWipeOut;
 		
 		
 		
@@ -26,8 +27,6 @@ package collab
 			scrollFactor.y = 0;
 			var w:uint = 140;
 			var h:uint = 90;
-			
-			// Does nothing. bug?
 			
 			var ox:int = (FlxG.width-w)/2;
 			var oy:int = (FlxG.height-h)/2;
@@ -75,9 +74,14 @@ package collab
 			
 			add(new FlxText(16, 78, w - 16, "Sound Up"), true);
 			
+			fadeWipe = new FlxWipeOut();
+			add(fadeWipe);
+			
+			/*
 			overlay = (new FlxSprite()).createGraphic(FlxG.width, FlxG.height, FlxU.getColor(0, 0, 0, 1.0));
 			overlay.alpha = 0.0;
 			add(overlay, true);
+			*/
 			
 			prevMousePos = new FlxPoint(0, 0);
 			
@@ -137,7 +141,7 @@ package collab
 						continueSelected = !continueSelected;
 					}
 					
-					if (FlxG.keys.justReleased("X") || FlxG.keys.justReleased("ESCAPE") || FlxG.keys.justReleased("P"))
+					if (FlxG.keys.justReleased("X"))// || FlxG.keys.justReleased("ESCAPE") || FlxG.keys.justReleased("P"))
 						FlxG.pause = false;
 					else if (FlxG.keys.justReleased("ENTER") || FlxG.keys.justReleased("C"))
 					{
@@ -170,40 +174,25 @@ package collab
 		
 		private function quitGame():void
 		{
-			TweenMax.to(overlay, 0.6, { alpha: 1.0, onComplete: switchToGameSelect } );
+			FlxG.pausingEnabled = false;
+			fadeWipe.start(FlixelCollab.ARNE_PALETTE_BLACK, 0.6, FlixelCollab.switchToGameSelect);
+			
 			FlxG.play(Resources.SFX_CONFIRM);
 			transitioning = true;
 		}
 		
 		
 		
-		private function switchToGameSelect():void
-		{
-			var state:IUnloadable = (FlxG.state as IUnloadable);
-			
-			if (state != null)
-			{
-				state.unload();
-				overlay.alpha = 0.0;
-				FlxG.pausingEnabled = true;
-				FlxG.pause = false;
-				
-				FlxG.state = new GameSelectState();
-			}
-		}
-		
-		
-		
 		override public function reset(X:Number, Y:Number):void
 		{
+			// Essentially this is called when the pause menu comes up.
 			super.reset(X, Y);
 			
 			transitioning = false;
 			firstFrame = true;
 			continueSelected = true;
 			mouseMode = false;
-			//FlxG.pausingEnabled = false;
-			TweenMax.pauseAll();
+			//TweenMax.pauseAll(); FlxGame.pauseGame() does this now.
 			prevMousePos.x = FlxG.mouse.cursor.x;
 			prevMousePos.y = FlxG.mouse.cursor.y;
 			
@@ -214,7 +203,9 @@ package collab
 		
 		override public function kill():void
 		{
-			TweenMax.resumeAll();
+			super.kill(); // this line causes weird shit to happen. it does?
+			
+			fadeWipe.exists = false;
 			FlxG.play(Resources.SFX_CANCEL);
 			FlxG.mouse.hide();
 		}

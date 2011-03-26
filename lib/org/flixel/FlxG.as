@@ -38,9 +38,17 @@ package org.flixel
 		 */
 		static protected var _pause:Boolean;
 		/**
-		 * Custom variable to allow pausing or not!
+		 * Whether to allow pausing or not.
 		 */
 		static public var pausingEnabled:Boolean = true;
+		/**
+		 * Whether to automatically pause when losing focus.
+		 */
+		static public var pauseOnFocusLost:Boolean = true;
+		/**
+		 * Whether to automatically unpause when focus is regained.
+		 */
+		static public var unpauseOnFocus:Boolean = true;
 		/**
 		 * Whether you are running in Debug or Release mode.
 		 * Set automatically by <code>FlxFactory</code> during startup.
@@ -175,11 +183,11 @@ package org.flixel
 		/**
 		 * A special effect that flashes a color on the screen.  Usage: FlxG.flash.start();
 		 */
-		static public var flash:FlxFlash;
+		static public var flash:FlxTransition;
 		/**
 		 * A special effect that fades a color onto the screen.  Usage: FlxG.fade.start();
 		 */
-		static public var fade:FlxFade;
+		static public var fade:FlxTransition;
 		
 		/**
 		 * Log data to the developer console.
@@ -205,23 +213,21 @@ package org.flixel
 		 */
 		static public function set pause(Pause:Boolean):void
 		{
-			if (!_pause && !pausingEnabled) return;
+			if (!pausingEnabled) return; // don't need to check _pause too because we might want to lock in pause menu.
 			
 			if(_pause != Pause)
 			{
 				if(Pause)
 				{
 					_pause = true;
+					pauseSounds(); // Move this before so that any sound playing in _game.pauseGame() happens.
 					_game.pauseGame();
-					pauseSounds();
-					_game.pause.reset(0, 0);
 				}
 				else
 				{
 					_pause = false;
-					_game.pause.kill();
+					playSounds(); // order doesn't really matter here though :P
 					_game.unpauseGame();
-					playSounds();
 				}
 			}
 		}

@@ -17,6 +17,8 @@ package org.flixel
 	
 	import org.flixel.data.FlxConsole;
 	import org.flixel.data.FlxPause;
+	
+	import com.greensock.*; // added this for tween pausing/resuming when pause screen is up.
 
 	/**
 	 * FlxGame is the heart of all flixel games, and contains a bunch of basic game loops and things.
@@ -49,7 +51,7 @@ package org.flixel
 		 * Override with your own <code>FlxLayer</code> for hot custom pause action!
 		 * Defaults to <code>data.FlxPause</code>.
 		 */
-		public var pause:FlxGroup;
+		public static var pause:FlxGroup; // made it static, because I can.
 		
 		//startup
 		internal var _iState:Class;
@@ -159,6 +161,9 @@ package org.flixel
 		 */
 		public function switchState(State:FlxState):void
 		{ 
+			// Added this!
+			TweenMax.killAll();
+			
 			//Basic reset stuff
 			FlxG.panel.hide();
 			FlxG.unfollow();
@@ -248,7 +253,7 @@ package org.flixel
 		 */
 		protected function onFocus(event:Event=null):void
 		{
-			if(FlxG.pause)
+			if(FlxG.unpauseOnFocus && FlxG.pause)
 				FlxG.pause = false;
 		}
 		
@@ -257,7 +262,8 @@ package org.flixel
 		 */
 		protected function onFocusLost(event:Event=null):void
 		{
-			FlxG.pause = true;
+			if (FlxG.pauseOnFocusLost && !FlxG.pause)
+				FlxG.pause = true;
 		}
 		
 		/**
@@ -265,8 +271,12 @@ package org.flixel
 		 */
 		internal function unpauseGame():void
 		{
+			// Resume all paused tweens.
+			TweenMax.resumeAll();
+			
 			if(!FlxG.panel.visible) flash.ui.Mouse.hide();
 			FlxG.resetInput();
+			pause.kill(); // Added for flixel collab. And because it's nice.
 			_paused = false;
 			stage.frameRate = _framerate;
 		}
@@ -276,12 +286,16 @@ package org.flixel
 		 */
 		internal function pauseGame():void
 		{
+			// Pause all tweens!
+			TweenMax.pauseAll();
+			
 			if((x != 0) || (y != 0))
 			{
 				x = 0;
 				y = 0;
 			}
 			//flash.ui.Mouse.show(); // Commented out for flixel collab
+			pause.reset(pause.x, pause.y); // Added for flixel collab. And because it's nice.
 			_paused = true;
 			stage.frameRate = _frameratePaused;
 		}

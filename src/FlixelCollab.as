@@ -44,6 +44,10 @@
 			ARNE_PALETTE_BLUE:uint 		  = ARNE_PALETTE_13,
 			ARNE_PALETTE_LIGHT_BLUE:uint  = ARNE_PALETTE_14,
 			ARNE_PALETTE_PALE_BLUE:uint   = ARNE_PALETTE_15;
+			
+		internal static var fadeWipe:FlxTransition;
+		internal static var flashWipe:FlxTransition;
+		internal static var collabPause:FlxGroup;
 		
 		/**
 		 * @private
@@ -60,15 +64,95 @@
 			// Make the game have 400x300 resolution at regular 2x pixel zoom. Start the game in PlayState.
 			super(320, 240, GameSelectState, 2);
 			
-			// Change the pause menu to be ours, not 
-			this.pause = new CollabPause();
+			// Set up our custom fade/flash.
+			fadeWipe = new FlxWipeOut();
+			flashWipe = new FlxWipeIn();
+			
+			collabPause = new CollabPause();
+			
+			// Set the default screen transitions (ones used ingame) to be different (no partial transparency!)
+			// FlxG.fade = new FlxWipe(); //in a sec
+			// FlxG.flash = new FlxWipe();
+			//pause = 
+			
+			swapTransitions();
 			
 			// Make the framerate while paused be not shitty.
 			FlxG.frameratePaused = 60;
-			
-			// Disable pausing at first since we're going into GameSelectState first.
-			FlxG.pausingEnabled = false;
         }
+		
+		
+		
+		public static function switchToGameSelect():void
+		{
+			var state:IUnloadable = (FlxG.state as IUnloadable);
+			
+			if (state == null)
+			{
+				FlxG.log("ERROR: YOUR GAME STATE DOES NOT IMPLEMENT IUNLOADABLE!\nCANNOT SWITCH STATE.");
+				return;
+			}
+			
+			state.unload();
+			
+			FlxG.pausingEnabled = true;
+			FlxG.pause = false;
+			
+			FlixelCollab.swapTransitions();
+			FlixelCollab.swapPauses();
+			
+			FlxG.state = new GameSelectState();
+			
+			// Enable unpausing on regain focus.
+			FlxG.unpauseOnFocus = true;
+		}
+		
+		public static function switchToSelectedGame():void
+		{
+			var gsState:GameSelectState = (FlxG.state as GameSelectState);
+			
+			if (gsState == null)
+			{
+				FlxG.log("You can only switch to a game from the game select state.");
+				return;
+			}
+			var gameClass:Class = gsState.selectedGame.gameClass;
+			var state:IUnloadable = (FlxG.state as IUnloadable);
+			if (state == null)
+			{
+				FlxG.log("ERROR: GAME SELECT DOES NOT IMPLEMENT IUNLOADABLE!\nCANNOT START SELECTED GAME.");
+				return;
+			}
+			
+			state.unload();
+			FlxG.mouse.hide();
+			
+			swapTransitions();
+			swapPauses();
+			
+			FlxG.state = new gameClass();
+			
+			// Make it so ingame pause menu won't disappear when refocusing.
+			FlxG.unpauseOnFocus = false;
+		}
+		
+		public static function swapTransitions():void
+		{
+			var swapTransition:FlxTransition = FlxG.fade;
+			FlxG.fade = FlixelCollab.fadeWipe;
+			FlixelCollab.fadeWipe = swapTransition;
+			swapTransition = FlxG.flash;
+			FlxG.flash = FlixelCollab.flashWipe;
+			FlixelCollab.flashWipe = swapTransition;
+		}
+		
+		public static function swapPauses():void
+		{
+			// swap pause!
+			var swapPause:FlxGroup = FlxGame.pause;
+			FlxGame.pause = FlixelCollab.collabPause;
+			FlixelCollab.collabPause = swapPause;
+		}
 		
 		/**
 		 * Call this to get the current instiated storage system.  GameStorage has all you need for saving/loading

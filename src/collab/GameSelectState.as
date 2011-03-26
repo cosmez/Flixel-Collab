@@ -23,7 +23,7 @@ package collab
 		private var startingGame :Boolean;
 		//private var testSprite :FlxSprite;
 		private var games:Vector.<CollabGameInfo>;
-		private var selectedGame:CollabGameInfo;
+		public var selectedGame:CollabGameInfo;
 		private var selectedGameIndices:FlxPoint;
 		private var gameIcons:FlxGroup;
 		private var gameIconGrid:Vector.<Vector.<FlxObject>>;
@@ -47,9 +47,6 @@ package collab
 		
 		override public function create() :void
 		{
-			// Disable pausing on the game select screen.
-			FlxG.pausingEnabled = false;
-			
 			// First of all, we make our ArcadeGameObjects.
 			games = new Vector.<CollabGameInfo>(6, true);
 			
@@ -278,26 +275,15 @@ package collab
 		
 		private function startGame():void
 		{
-			if (games[(selectedGameIndices.y * gameIconGrid.length) + selectedGameIndices.x].gameClass == null) return;
+			if (selectedGame.gameClass == null) return;
 			
 			FlxG.fade.start(0xff000000, 0.6, null, true); // Can't do a fade in the final one
-			TweenMax.to(this, 0.6, { songVolume: 0.0, onUpdate: updateSongVolume, onComplete: switchState } );
-			startingGame = true;
+			TweenMax.to(this, 0.6, { songVolume: 0.0, onUpdate: updateSongVolume, onComplete: FlixelCollab.switchToSelectedGame } );
 			selectorSprite.innerSpeed *= 8;
 			selectorSprite.outerSpeed *= 2;
 			selectorSprite.shouldFlash = true;
+			startingGame = true;
 			FlxG.play(Resources.SFX_CONFIRM);
-		}
-		
-		
-		
-		private function switchState():void
-		{
-			var gameClass:Class = games[(selectedGameIndices.y * gameIconGrid.length) + selectedGameIndices.x].gameClass;
-			FlxG.pausingEnabled = true;
-			unload();
-			FlxG.mouse.hide();
-			FlxG.state = new gameClass();
 		}
 		
 		
