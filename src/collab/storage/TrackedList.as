@@ -116,19 +116,23 @@ package collab.storage
 					 * memory representation of our storedData.
 					 */
 
-					 // Reload stored data back into a dataClass
-					 var bytes:ByteArray = data.storedData ;
-					 var dataClassRef:* = FlxU.getClass (data.dataClassType) ;
-					 var dataClass:* = dataClassRef (bytes.readObject()) ;
+					// Reload stored data back into a dataClass
+					var bytes:ByteArray = data.storedData ;
+					// Reset pointer (in case this has been done before)
+					bytes.position = 0 ;
+					
+					var dataClassType:* = FlxU.getClass (data.dataClassType) ;
+					var dataClass:* = dataClassType (bytes.readObject()) ;
 					 
-					 // Update dataClassRef to point to this new data class
-					 data.dataClassRef = dataClassRef ;
+				 
+					// Update dataClassRef to point to this new data class
+					data.dataClassRef = dataClass ;
 					 
-					 // Now, re-institiate our original class
-					 var originalClassRef:* = FlxU.getClass (data.instantiatedClassType) ;
-					 var originalClass:* = new originalClassRef (dataClass) ;
+					// Now, re-institiate our original class
+					var originalClassType:* = FlxU.getClass (data.instantiatedClassType) ;
+					var originalClass:* = new originalClassType (dataClass) ;
 					 
-					 cnt++ ;					
+					cnt++ ;					
 				}
 			}			
 			FlxG.log ("TrackedList::recreate: " + this + " recreated " + cnt + " objects.") ;

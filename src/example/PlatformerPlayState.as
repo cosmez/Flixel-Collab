@@ -2,6 +2,7 @@ package example
 {
 	import collab.storage.GameStorage;
 	import example.storage.PlatformerGameData ;
+	import example.storage.enemy.EnemyStateData ;
 	
 	import flash.geom.Point;
 	import org.flixel.*;
@@ -16,6 +17,7 @@ package example
 	{
 		// lol
 		private var player:Player;
+		private var enemies:FlxGroup ;
 		private var map:FlxTilemap;
 		private var modProcessor:ModProcessor;
 		private var path:Vector.<Point>;
@@ -33,6 +35,9 @@ package example
 			
 			player = new Player(200, 200);
 			add(player);
+			
+			enemies = new FlxGroup ;			
+			add (enemies) ;
 			
 			FlxG.follow(player, 1.0);
 			FlxG.followBounds(0, 0, map.width, map.height, true);
@@ -60,9 +65,28 @@ package example
 				
 				// Create 5 random enemies and place them throughout the level
 				
-				
+				for (var i:int = 0; i < 5; i++)
+				{
+					var open:FlxPoint = findOpenSpot() ;
+					
+					// First we create the enemy state data.  This is what is saved/loaded into the save game.
+					var enemyState:EnemyStateData = new EnemyStateData ;
+					enemyState.loadInitialValues( { x: open.x, y: open.y } ) ;
+					
+					// Now, actually create an enemy
+					var enemy:Enemy = new Enemy (enemyState) ;
+				}
+			} else
+			{
+				// re-create our enemies
+				gameData.restoreTracked() ;
 			}
 			
+			// Reposition our player to the start position
+			player.x = gameData.playerPos.x ;
+			player.y = gameData.playerPos.y ;
+			
+			saveGame() ;
 		}
 		
 		
@@ -86,6 +110,16 @@ package example
 			*/
 			
 			FlxU.collide(player, map);
+			
+			FlxU.collide (enemies, map) ;
+			
+			FlxU.collide (player, enemies) ;
+			
+			if (FlxG.keys.justPressed ("ESCAPE"))
+			{
+				FlxG.state = new PlatformerTitleState ;
+				saveGame() ;
+			}
 		}
 		
 		
@@ -112,6 +146,69 @@ package example
 			}
 		}
 		
+		public function getEnemyGroup():FlxGroup
+		{
+			return enemies ;
+		}
+		
+		public function saveGame():void
+		{
+			gameData.playerPos.x = player.x ;
+			gameData.playerPos.y = player.y ;
+			
+			// Save our game
+			gameData.saveTracked() ;
+			storage.writeGameData (gameData) ;			
+		}
+		
+		private function getCollisionStatus (x:int, y:int, w:int, h:int):Boolean
+		{
+			for (var tx:int = x; tx < x + w; tx++)
+				for (var ty:int = y; ty < y + h; ty++)
+					if (map.getTile (tx, ty) >= map.collideIndex)
+						return true ;
+			return false ;
+		}
+		
+		private function findOpenSpot():FlxPoint
+		{
+			var point:FlxPoint = new FlxPoint ;
+			var open:Boolean = false ;
+			while (!open)
+			{
+				var top:Boolean = FlxU.random() >= 0.5 ? true : false ;
+				point.x = Math.floor (FlxU.random() * (map.widthInTiles - 1)) ;
+				point.y = 0 ;
+				if (top)
+				{				
+					// Walk from top to bottom until we find an empty spot
+					for (var y:int = 4; y < map.heightInTiles - 4; y++)
+					{
+						if (!getCollisionStatus (point.x, y, 2, 2))
+						{
+							point.y = y ;
+							open = true ;
+						}
+					}
+				} else
+				{
+					// Walk from bottom to top yada yada
+					for (y = map.heightInTiles - 4; y > 4; y--)
+					{
+						if (!getCollisionStatus (point.x, y, 2, 2))
+						{
+							point.y = y ;
+							open = true ;
+						}
+					}
+				}
+			}
+			
+			point.x *= 16 ;
+			point.y *= 16 ;
+			
+			return point ;
+		}
 		
 		
 		// THIS FUNCTION MUST BE DEFINED AND CALLED BEFORE SWITCHING STATES!!!

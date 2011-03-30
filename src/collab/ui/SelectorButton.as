@@ -9,7 +9,7 @@ package collab.ui
 	 */
 	public class SelectorButton extends FlxObject
 	{
-		protected var _normalButton:FlxObject, _litButton:FlxObject ;
+		protected var _normalButton:FlxObject, _litButton:FlxObject, _disabledButton:FlxObject ;
 		
 		protected var _onClick:Function ;
 		
@@ -17,13 +17,15 @@ package collab.ui
 		
 		protected var _selected:Boolean = false ;
 		
-		public function SelectorButton(X:int, Y:int, Width:int, Height:int, normalButton:FlxObject, litButton:FlxObject, onClick:Function, enabled:Boolean = true) 
+		public function SelectorButton(X:int, Y:int, Width:int, Height:int, normalButton:FlxObject, litButton:FlxObject, disabledButton:FlxObject, onClick:Function, enabled:Boolean = true) 
 		{
 			super(X, Y, Width, Height);
 			
 			_normalButton = normalButton ;
 			
 			_litButton = litButton ;
+			
+			_disabledButton = disabledButton ;
 			
 			_enabled = enabled ;
 			
@@ -33,8 +35,10 @@ package collab.ui
 		override public function render():void
 		{
 			// Do rendering ourselves
-			if (_enabled && _selected)
+			if (_selected)
 				_litButton.render() ;
+			else if (!_enabled && _disabledButton)
+				_disabledButton.render() ;
 			else
 				_normalButton.render() ;
 		}

@@ -1,4 +1,4 @@
-package chainedlupine.storage.enemy
+package example.storage.enemy
 {
 	import collab.storage.GenericData ;
 	
@@ -11,14 +11,12 @@ package chainedlupine.storage.enemy
 	 */
 	public class EnemyStateData extends GenericData
 	{
-		public var enemyName:String ;
 		public var x:int ;
 		public var y:int ;
 		
 		public function EnemyStateData() 
 		{
 			// Set some sane defaults
-			enemyName = "nobody" ;
 			x = 0 ;
 			y = 0 ;			
 		}

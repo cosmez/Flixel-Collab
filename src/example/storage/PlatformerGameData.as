@@ -3,8 +3,7 @@ package example.storage
 	import collab.storage.GameData ;
 	import collab.storage.TrackedList ;
 	
-	import chainedlupine.storage.enemy.EnemyStateData ;
-	import chainedlupine.storage.enemy.ThingStateData ;
+	import example.storage.enemy.EnemyStateData ;
 	
 	import org.flixel.* ;
 	
@@ -22,8 +21,10 @@ package example.storage
 		// A list of all enemies that are tracked in the save
 		public var trackedEnemies:TrackedList ;
 		
-		// The number of stones the player carries
-		public var stones:int ;
+		// The number of bullets the player carries
+		public var bullets:int ;
+		
+		public var playerPos:FlxPoint ;
 		
 		/**
 		 * In the constructor, we must make sure that we load in the "sane" defaults, which would be used to start
@@ -35,6 +36,8 @@ package example.storage
 			super() ;
 			
 			// Be sure to register any classes that might get tracked in this GameData OR in any of its tracked objects!			
+			registerClass (EnemyStateData) ;
+			registerClass (FlxPoint) ;
 			
 			// Set to sane defaults
 			clear() ;
@@ -52,8 +55,11 @@ package example.storage
 			trackedEnemies = new TrackedList ;
 			addTrackerList (trackedEnemies) ;
 			
-			// Player always starts with five stones
-			stones = 5 ;
+			// Player always starts with eight bullets
+			bullets = 8 ;
+			
+			// Set player's start position to a sane default
+			playerPos = new FlxPoint (200, 200) ;
 		}
 		
 	}

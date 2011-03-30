@@ -65,7 +65,6 @@
 			
 			// Make the game have 400x300 resolution at regular 2x pixel zoom. Start the game in PlayState.
 			super(320, 240, GameSelectState, 2);
-			//super (320, 240, PlatformerTitleState, 2) ;
 			
 			// Set up our custom fade/flash.
 			fadeWipe = new FlxWipeOut();

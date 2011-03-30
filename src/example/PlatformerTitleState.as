@@ -45,6 +45,7 @@ package example
 			
 			var saveGamePresent:Boolean = _storage.gameDataExists (PlatformerGameData) ;
 			
+			// Create the new game button
 			var newGameButtonNormal:FlxGroup = new FlxGroup ;
 			newGameButtonNormal.add ((new FlxSprite (FlxG.width / 2 - 80, 150)).createGraphic (160, 20, 0xFF222222)) ;			
 			newGameButtonNormal.add (new FlxText (0, 150, FlxG.width, "Start New Game").setFormat (null, 16, 0x555555, "center", 0x222222)) ;
@@ -53,9 +54,10 @@ package example
 			newGameButtonLit.add ((new FlxSprite (FlxG.width / 2 - 80, 150)).createGraphic (160, 20, 0xFF444444)) ;			
 			newGameButtonLit.add (new FlxText (0, 150, FlxG.width, "Start New Game").setFormat (null, 16, 0xFFFFFF, "center", 0x555555)) ;
 			
-			var newGameSelector:SelectorButton = new SelectorButton (FlxG.width / 2 - 80, 150, 160, 20, newGameButtonNormal, newGameButtonLit, onNewGame) ;
+			var newGameSelector:SelectorButton = new SelectorButton (FlxG.width / 2 - 80, 150, 160, 20, newGameButtonNormal, newGameButtonLit, null, onNewGame) ;
 			add (newGameSelector) ;
 			
+			// Create the continue game button
 			var ContinueGameButtonNormal:FlxGroup = new FlxGroup ;
 			ContinueGameButtonNormal.add ((new FlxSprite (FlxG.width / 2 - 80, 180)).createGraphic (160, 20, 0xFF222222)) ;			
 			ContinueGameButtonNormal.add (new FlxText (0, 180, FlxG.width, "Continue Game").setFormat (null, 16, 0x555555, "center", 0x222222)) ;
@@ -63,8 +65,12 @@ package example
 			var ContinueGameButtonLit:FlxGroup = new FlxGroup ;
 			ContinueGameButtonLit.add ((new FlxSprite (FlxG.width / 2 - 80, 180)).createGraphic (160, 20, 0xFF444444)) ;			
 			ContinueGameButtonLit.add (new FlxText (0, 180, FlxG.width, "Continue Game").setFormat (null, 16, 0xFFFFFF, "center", 0x555555)) ;
+
+			var ContinueGameButtonDisabled:FlxGroup = new FlxGroup ;
+			ContinueGameButtonDisabled.add ((new FlxSprite (FlxG.width / 2 - 80, 180)).createGraphic (160, 20, 0xFF440000)) ;			
+			ContinueGameButtonDisabled.add (new FlxText (0, 180, FlxG.width, "Continue Game").setFormat (null, 16, 0x990000, "center", 0x550000)) ;
 			
-			var continueGameSelector:SelectorButton = new SelectorButton (FlxG.width / 2 - 80, 180, 160, 20, ContinueGameButtonNormal, ContinueGameButtonLit, onContinueGame, saveGamePresent) ;
+			var continueGameSelector:SelectorButton = new SelectorButton (FlxG.width / 2 - 80, 180, 160, 20, ContinueGameButtonNormal, ContinueGameButtonLit, ContinueGameButtonDisabled, onContinueGame, saveGamePresent) ;
 			add (continueGameSelector) ;
 			
 			// Always start with New Game selected
