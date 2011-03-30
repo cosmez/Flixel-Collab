@@ -1,5 +1,8 @@
 package example
 {
+	import collab.storage.GameStorage;
+	import example.storage.PlatformerGameData ;
+	
 	import flash.geom.Point;
 	import org.flixel.*;
 	import neoart.flod.*;
@@ -9,7 +12,7 @@ package example
 	import collab.IUnloadable;
 	
 	// Yoooo
-	public class PlatformerDemoState extends FlxState implements IUnloadable
+	public class PlatformerPlayState extends FlxState implements IUnloadable
 	{
 		// lol
 		private var player:Player;
@@ -17,7 +20,9 @@ package example
 		private var modProcessor:ModProcessor;
 		private var path:Vector.<Point>;
 		
+		public var storage:GameStorage ;
 		
+		public var gameData:PlatformerGameData ;
 		
 		override public function create():void
 		{
@@ -34,6 +39,30 @@ package example
 			
 			modProcessor = new ModProcessor();
 			//playSong();
+			
+			// Get a reference to the global storage mechanism
+			storage = FlixelCollab.getStorage() ;
+			
+			// Set our sub-folder to be "PlatformerExampleGame"
+			// (All values read/written will be private to this storage folder.)
+			storage.setFolder ("PlatformerExampleGame") ;
+			
+			// Register our save game data class
+			storage.registerGameData (PlatformerGameData) ;
+			
+			// Load game state data
+			gameData = storage.readGameData (PlatformerGameData) ;
+			
+			// If no enemies are stored, then perform initial enemy initialization
+			if (!gameData.trackedEnemies.length)
+			{
+				FlxG.log ("No enemies saved, so we're making new ones.") ;
+				
+				// Create 5 random enemies and place them throughout the level
+				
+				
+			}
+			
 		}
 		
 		

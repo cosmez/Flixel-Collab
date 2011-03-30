@@ -128,12 +128,13 @@ package collab.storage
 		{
 			if (_save)
 			{
+				var classReference:* = FlxU.getClass (FlxU.getClassName (gameDataClass)) ;
+				
 				var buffer:ByteArray = ByteArray (readData (FlxU.getClassName (gameDataClass))) ;
 				if (buffer)
 				{
 					// No point in compressing for local storage, as AMF3 format is already zlib compressed
 					//buffer.uncompress() ;
-					var classReference:* = FlxU.getClass (FlxU.getClassName (gameDataClass)) ;
 					var gameData:* = classReference (buffer.readObject()) ;
 					// Check our version number to make sure they match
 					if ((gameData as GameData).version == versionRequired)
@@ -144,11 +145,35 @@ package collab.storage
 						return new classReference ;  // ...otherwise return a newly instantiated version
 					}
 				} else
-					return null ;
+					return new classReference ;  // We've never saved this data, so return a new instance
 			} else
 				return null ;
 		}
 		
+		/**
+		 * Real simple, just check to see if we've saved a copy of this game data.
+		 */
+		public function gameDataExists (gameDataClass:*, versionRequired:String = "1.0"):Boolean
+		{
+			if (_save)
+			{
+				return (exists (FlxU.getClassName (gameDataClass))) ;
+			} else
+				return false ;
+			
+		}
+		
+		/**
+		 * Erases this particular gameDataClass from the save data.
+		 */
+		public function clearGameData (gameDataClass:*):void
+		{
+			if (_save)
+			{
+				if (exists (FlxU.getClassName (gameDataClass)))
+					writeData (FlxU.getClassName (gameDataClass), null) ;
+			}
+		}
 	
 		/**
 		 * Deeper, internal-ish function that reads data from a specific folder in the save.

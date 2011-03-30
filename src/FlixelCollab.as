@@ -3,6 +3,8 @@
 	import org.flixel.*;
 	import collab.*;
 	import collab.storage.GameStorage ;
+	
+	import example.PlatformerTitleState ;
 
 	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
     [Frame(factoryClass="Preloader")]
@@ -63,6 +65,7 @@
 			
 			// Make the game have 400x300 resolution at regular 2x pixel zoom. Start the game in PlayState.
 			super(320, 240, GameSelectState, 2);
+			//super (320, 240, PlatformerTitleState, 2) ;
 			
 			// Set up our custom fade/flash.
 			fadeWipe = new FlxWipeOut();

@@ -143,6 +143,11 @@ package collab.storage
 			return FlxU.getClassName (this) ;
 		}
 		
+		public function get length():int
+		{
+			return (list.length) ;
+		}
+		
 	}
 
 }

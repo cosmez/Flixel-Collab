@@ -60,5 +60,13 @@ package org.flixel
 		{
 			return y + height;
 		}
+		
+		/**
+		 * Returns true if the point given is within our rectangle.
+		 */
+		public function contains (px:int, py:int):Boolean
+		{
+			return (px >= left && px <= right && py >= top && py <= bottom) ;
+		}
 	}
 }

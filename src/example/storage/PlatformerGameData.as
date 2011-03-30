@@ -1,4 +1,4 @@
-package chainedlupine.storage
+package example.storage
 {
 	import collab.storage.GameData ;
 	import collab.storage.TrackedList ;
@@ -10,30 +10,31 @@ package chainedlupine.storage
 	
 	
 	/**
-	 * ...
+	 * This class acts like a storage class for holding our game's global state and save data.
+	 * 
+	 * As long as we put variables in this class, it will be automatically saved (and read) when we engage the Collab
+	 * game save mechanism.
+	 * 
 	 * @author David Grace
 	 */
-	public class BeatEmUpData extends GameData 
+	public class PlatformerGameData extends GameData 
 	{
-		public var atest:String ;
-		
-		// A list of all enemies that are tracked
+		// A list of all enemies that are tracked in the save
 		public var trackedEnemies:TrackedList ;
 		
-		// Another list of things to track
-		public var trackedThings:TrackedList ;
+		// The number of stones the player carries
+		public var stones:int ;
 		
-		// Yes, you can store XML
-		public var testXML:XML ;
-		
-		public function BeatEmUpData() 
+		/**
+		 * In the constructor, we must make sure that we load in the "sane" defaults, which would be used to start
+		 * a new game.
+		 */
+		public function PlatformerGameData() 
 		{
 			// Call super, otherwise import stuff doesn't get registered!
 			super() ;
 			
 			// Be sure to register any classes that might get tracked in this GameData OR in any of its tracked objects!			
-			registerClass (EnemyStateData) ;
-			registerClass (ThingStateData) ;
 			
 			// Set to sane defaults
 			clear() ;
@@ -42,27 +43,17 @@ package chainedlupine.storage
 		/**
 		 * Simple clearing method.  This just sets everything back to sane defaults.  It's import you have this, as 
 		 * if there are any gaps in our incoming data stream, you will end up with null'd values.
+		 * 
+		 * Just set everything back to your defaults for a new game.  This function can be called by hand to force
+		 * a new game.  Just clear(), then use GameStorage::saveGameData().
 		 */
 		override public function clear():void
 		{
-			// Create a new tracking list for our enemies
 			trackedEnemies = new TrackedList ;
 			addTrackerList (trackedEnemies) ;
 			
-			// And another tracking list for our things
-			trackedThings = new TrackedList ;
-			addTrackerList (trackedThings) ;
-			
-			// Just write some garbage out to these properties to test things
-			atest = "Yay!" ;
-			
-			// XML is being stored in us.  Ut-oh!
-			testXML = 
-				<blargh stuff="blub">
-					<!-- Comments are stripped out, BTW. :) -->
-					Text, in *MY* XML?
-				</blargh> ;
-			
+			// Player always starts with five stones
+			stones = 5 ;
 		}
 		
 	}
