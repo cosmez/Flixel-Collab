@@ -15,7 +15,7 @@ package collab
 		private var firstFrame:Boolean;
 		private var mouseMode:Boolean;
 		private var prevMousePos:FlxPoint;
-		private var fadeWipe:FlxWipeOut;
+		private var fadeWipe:WipeOut;
 		
 		
 		
@@ -74,7 +74,7 @@ package collab
 			
 			add(new FlxText(16, 78, w - 16, "Sound Up"), true);
 			
-			fadeWipe = new FlxWipeOut();
+			fadeWipe = new WipeOut();
 			add(fadeWipe);
 			
 			/*
@@ -175,7 +175,7 @@ package collab
 		private function quitGame():void
 		{
 			FlxG.pausingEnabled = false;
-			fadeWipe.start(FlixelCollab.ARNE_PALETTE_BLACK, 0.6, FlixelCollab.switchToGameSelect);
+			fadeWipe.start(FlixelCollab.ARNE_PALETTE_BLACK, 0.6, function():void{ FlxG.state = new GameSelectState(); } );
 			
 			FlxG.play(Resources.SFX_CONFIRM);
 			transitioning = true;

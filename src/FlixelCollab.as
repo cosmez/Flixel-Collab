@@ -1,16 +1,18 @@
 ﻿package 
 {
+	import example.PlatformerPlayState;
 	import org.flixel.*;
 	import collab.*;
-	import collab.storage.GameStorage ;
-	
-	import example.PlatformerTitleState ;
+	import collab.storage.GameStorage;
 
 	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
     [Frame(factoryClass="Preloader")]
 
     public class FlixelCollab extends FlxGame
     {
+		private static const startingState:Class = PlatformerPlayState; // Change "GameSelectState" to be the Class of your game's FlxState!
+																	// (try example.PlatformerPlayState)
+		
 		public static const
 			ARNE_PALETTE_0:uint  = FlxU.getColor(  0,   0,   0), // BLACK
 			ARNE_PALETTE_1:uint  = FlxU.getColor(157, 157, 157), // GREY
@@ -47,37 +49,47 @@
 			ARNE_PALETTE_LIGHT_BLUE:uint  = ARNE_PALETTE_14,
 			ARNE_PALETTE_PALE_BLUE:uint   = ARNE_PALETTE_15;
 			
-		internal static var fadeWipe:FlxTransition;
-		internal static var flashWipe:FlxTransition;
-		internal static var collabPause:FlxGroup;
+		private static var fadeWipe:FlxTransition;
+		private static var flashWipe:FlxTransition;
+		private static var altPause:FlxGroup;
 		
 		/**
 		 * @private
 		 * 
 		 * The reference to our storage system.  This is initialized during startup of FlixelCollab.
 		 */
-		public var storage:GameStorage ;
+		private static var _storage:GameStorage;
+		
+		
 		
         public function FlixelCollab()
         {
 			// Start up the storage system -- has no dependencies on flixel, so it's cool
-			storage = new GameStorage ("FlixelCollabI") ;
+			_storage = new GameStorage("FlixelCollabI");
 			
 			// Make the game have 400x300 resolution at regular 2x pixel zoom. Start the game in PlayState.
-			super(320, 240, GameSelectState, 2);
+			super(320, 240, startingState, 2);
 			
-			// Set up our custom fade/flash.
-			fadeWipe = new FlxWipeOut();
-			flashWipe = new FlxWipeIn();
-			
-			collabPause = new CollabPause();
+			// gotta do this to instantiate the mouse graphic.
+			FlxG.mouse.show();
+			FlxG.mouse.hide();
 			
 			// Set the default screen transitions (ones used ingame) to be different (no partial transparency!)
-			// FlxG.fade = new FlxWipe(); //in a sec
-			// FlxG.flash = new FlxWipe();
-			//pause = 
+			FlxG.fade = new WipeOut();
+			FlxG.flash = new WipeIn();
 			
-			swapTransitions();
+			// Set up our custom fade/flash.
+			fadeWipe = new WipeOut();
+			flashWipe = new WipeIn();
+			
+			pause = new CollabPause();
+			altPause = new GameSelectPause();
+			
+			if (startingState == GameSelectState)
+			{
+				swapTransitions();
+				swapPauses();
+			}
 			
 			// Make the framerate while paused be not shitty.
 			FlxG.frameratePaused = 60;
@@ -85,76 +97,54 @@
 		
 		
 		
-		public static function switchToGameSelect():void
+		override public function switchState(State:FlxState):void
 		{
-			var state:IUnloadable = (FlxG.state as IUnloadable);
-			
-			if (state == null)
+			if (_state as GameSelectState != null)
 			{
-				FlxG.log("ERROR: YOUR GAME STATE DOES NOT IMPLEMENT IUNLOADABLE!\nCANNOT SWITCH STATE.");
-				return;
+				FlxG.mouse.hide();
+			
+				FlxG.unpauseOnFocus = false;
+			
+				swapTransitions();
+				swapPauses();
+			}
+			else if (State as GameSelectState != null)
+			{
+				FlxG.pausingEnabled = true;
+				FlxG.unpauseOnFocus = true;
+				FlxG.pause = false;
+			
+				swapTransitions();
+				swapPauses();
 			}
 			
-			state.unload();
-			
-			FlxG.pausingEnabled = true;
-			FlxG.pause = false;
-			
-			FlixelCollab.swapTransitions();
-			FlixelCollab.swapPauses();
-			
-			FlxG.state = new GameSelectState();
-			
-			// Enable unpausing on regain focus.
-			FlxG.unpauseOnFocus = true;
+			super.switchState(State);
 		}
 		
-		public static function switchToSelectedGame():void
-		{
-			var gsState:GameSelectState = (FlxG.state as GameSelectState);
-			
-			if (gsState == null)
-			{
-				FlxG.log("You can only switch to a game from the game select state.");
-				return;
-			}
-			var gameClass:Class = gsState.selectedGame.gameClass;
-			var state:IUnloadable = (FlxG.state as IUnloadable);
-			if (state == null)
-			{
-				FlxG.log("ERROR: GAME SELECT DOES NOT IMPLEMENT IUNLOADABLE!\nCANNOT START SELECTED GAME.");
-				return;
-			}
-			
-			state.unload();
-			FlxG.mouse.hide();
-			
-			swapTransitions();
-			swapPauses();
-			
-			FlxG.state = new gameClass();
-			
-			// Make it so ingame pause menu won't disappear when refocusing.
-			FlxG.unpauseOnFocus = false;
-		}
+		
 		
 		public static function swapTransitions():void
 		{
 			var swapTransition:FlxTransition = FlxG.fade;
-			FlxG.fade = FlixelCollab.fadeWipe;
-			FlixelCollab.fadeWipe = swapTransition;
+			FlxG.fade = fadeWipe;
+			fadeWipe = swapTransition;
+			
 			swapTransition = FlxG.flash;
-			FlxG.flash = FlixelCollab.flashWipe;
-			FlixelCollab.flashWipe = swapTransition;
+			FlxG.flash = flashWipe;
+			flashWipe = swapTransition;
 		}
+		
+		
 		
 		public static function swapPauses():void
 		{
 			// swap pause!
-			var swapPause:FlxGroup = FlxGame.pause;
-			FlxGame.pause = FlixelCollab.collabPause;
-			FlixelCollab.collabPause = swapPause;
+			var swapPause:FlxGroup = pause;
+			pause = altPause;
+			altPause = swapPause;
 		}
+		
+		
 		
 		/**
 		 * Call this to get the current instiated storage system.  GameStorage has all you need for saving/loading
@@ -164,7 +154,7 @@
 		 */
 		static public function getStorage():GameStorage
 		{
-			return (FlxG.game as FlixelCollab).storage ;
+			return _storage; //(FlxG.game as FlixelCollab).storage;
 		}
     }
 }

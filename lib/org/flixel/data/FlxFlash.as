@@ -16,24 +16,21 @@ package org.flixel.data
 			createGraphic(FlxG.width,FlxG.height,0,true);
 		}
 		
-		/**
-		 * Updates and/or animates this special effect
-		 */
-		override public function update():void
+		override public function finish():Boolean
 		{
-			// if (!inProgress)
-			// {
-			// 	   final state of anim
-			// }
-			// else
-			// {
+			if (!super.finish()) return false;
 			
-			if(alpha <= 0)
-			{
-				finish();
-				exists = false;
-			}
-			alpha -= FlxG.elapsed / _duration; // this used to be above the if
+			exists = false;
+			return true;
+		}
+		
+		/**
+		 * Animates this special effect
+		 */
+		override public function render():void
+		{
+			alpha = 1 - (_progress / _duration);
+			super.render();
 		}
 		
 		// This is alled automatically by start().

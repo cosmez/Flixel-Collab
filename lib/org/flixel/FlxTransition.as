@@ -11,6 +11,11 @@ package org.flixel
 		protected var _inProgress:Boolean;
 		
 		/**
+		 * How far along we are in the effect (in seconds).
+		 */
+		protected var _progress:Number;
+		
+		/**
 		 * How long the effect should last.
 		 */
 		protected var _duration:Number;
@@ -62,21 +67,46 @@ package org.flixel
 			_complete = OnComplete;
 			exists = true;
 			setup();
+			_progress = 0.0;
 			_inProgress = true;
 		}
 		
-		/**
-		 * Forces the transition to skip to its end.
-		 */
-		public function finish():void
+		
+		
+		override public function update():void
 		{
+			super.update();
+			
+			// Updates _progress according to FlxG.elapsed.
+			if (!_inProgress) return;
+			
+			if (_progress == _duration) finish();
+			else
+			{
+				_progress += FlxG.elapsed;
+				if (_progress >= _duration) _progress = _duration;
+			}
+		}
+		
+		
+		
+		/**
+		 * Sets this screen effect to its finished state. Returns false if not started or already finished.
+		 */
+		public function finish():Boolean
+		{
+			if (!exists || !_inProgress) return false;
+			
 			_inProgress = false;
+			_progress = _duration;
 			
 			if (_complete != null)
 			{
 				_complete();
 				_complete = null;
 			}
+			
+			return true;
 		}
 		
 		/**

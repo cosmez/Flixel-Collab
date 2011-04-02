@@ -9,12 +9,12 @@ package collab
 	import flash.utils.ByteArray;
 	
 	// The games themselves!
-	import example.PlatformerTitleState ;
+	import example.PlatformerTitleState;
 	
 	
 	
 	// The GameSelectState is where the game starts at!
-	public class GameSelectState extends FlxState implements IUnloadable
+	public class GameSelectState extends FlxState
 	{
 		// Variables
 		private var modProcessor:ModProcessor;
@@ -51,7 +51,7 @@ package collab
 			
 			games[0] = new CollabGameInfo(null, null, "FUCKR", "morganq", "lolLOL");
 			games[1] = new CollabGameInfo(null, null, "Supa-Shmup", "kibo", "Pew! Pew! Pew!");
-			games[2] = new CollabGameInfo(null, null, "Zombie Dating Sim", "skiffles", "Hey, I said that I WASN'T making a game for this.");
+			games[2] = new CollabGameInfo(null, null, "Herp Derp", "ChainedLupine", "Herp burp lerp slerp derp flerp gerp perp shurp nurp drerp rerp blurp slurp merp");
 			games[3] = new CollabGameInfo(null, null, "Rainyvania", "Zenka", "Are you a bad enough dude to find the upgrades?");
 			games[4] = new CollabGameInfo(example.PlatformerTitleState, Resources.GFX_GAME1_ICON, "FlxCrawler", "Ace20", "A simple, fun dungeon crawler game!");
 			games[4].previewImages.push(Resources.GFX_GAME1_PREVIEW1);
@@ -132,22 +132,6 @@ package collab
 			add(titleCharShadows);
 			add(titleChars);
 			
-			//var titleText:FlxBitmapFont = new FlxBitmapFont(Resources.GFX_TITLE_FONT, 16, 16, FlxBitmapFont.TEXT_SET4, 20, 0, 1);
-			//titleText.width = FlxG.width;
-			//titleText.setText("WOO HEY TESTING");
-			//titleText.align = FlxBitmapFont.ALIGN_RIGHT;
-			
-			//var titleFont:org.flixel.cai.FlxBitmapFont = new org.flixel.cai.FlxBitmapFont(Resources.GFX_TITLE_FONT, 16, 17, 0, 0, org.flixel.FlxBitmapFont.TEXT_SET4);
-			//var titleText:FlxBitmapText = new FlxBitmapText(0, 0, titleFont, "WOO! ALRIGHT SWEET!", "center", 0);
-			//titleText.colorFont = true;
-			//add(titleText);
-			
-			//var logoText:FlxText = new FlxText(0, 4, FlxG.width, "Flixel Collab!");
-			//logoText.setFormat(null, 16, FlxU.getColor(192, 192, 255), "center", FlxU.getColor(0, 0, 0, 0.5));
-			//logoText.shadow = 1;
-			//logoText.solid = false;
-			//add(logoText);
-			
 			// Add the selector sprite.
 			selectorSprite = new SelectorSprite(0, 0, gameIconGrid[0][0].width, gameIconGrid[0][0].height);
 			add(selectorSprite);
@@ -164,9 +148,6 @@ package collab
 			
 			startingGame = false;
 			prevMousePos = new FlxPoint(-1, -1);
-			
-			FlxG.mouse.show(); // gotta do this to instantiate the mouse graphic.
-			FlxG.mouse.hide();
 		}
 		
 		
@@ -211,7 +192,7 @@ package collab
 					{
 						// Mouse is overlapping an icon.
 						updateSelectedGame();
-						if (FlxG.mouse.justPressed()) startGame();
+						if (FlxG.mouse.justReleased()) startGame();
 					}
 				}
 				else
@@ -275,7 +256,7 @@ package collab
 			if (selectedGame.gameClass == null) return;
 			
 			FlxG.fade.start(0xff000000, 0.6, null, true); // Can't do a fade in the final one
-			TweenMax.to(this, 0.6, { songVolume: 0.0, onUpdate: updateSongVolume, onComplete: FlixelCollab.switchToSelectedGame } );
+			TweenMax.to(this, 0.6, { songVolume: 0.0, onUpdate: updateSongVolume, onComplete: function():void{ if (selectedGame.gameClass != null) FlxG.state = new selectedGame.gameClass(); } } );
 			selectorSprite.innerSpeed *= 8;
 			selectorSprite.outerSpeed *= 2;
 			selectorSprite.shouldFlash = true;
@@ -349,8 +330,10 @@ package collab
 		
 		
 		
-		public function unload():void
+		override public function destroy():void
 		{
+			super.destroy();
+			
 			//testSprite = null;
 			for (var i:int = 0; i < games.length; i++) { games[i] = null; gameIconGrid[i % 2][int(i / 2)] = null; }
 			games = null;

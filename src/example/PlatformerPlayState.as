@@ -10,10 +10,9 @@ package example
 	import flash.utils.ByteArray;
 	import flash.media.SoundTransform;
 	import collab.GameSelectState;
-	import collab.IUnloadable;
 	
 	// Yoooo
-	public class PlatformerPlayState extends FlxState implements IUnloadable
+	public class PlatformerPlayState extends FlxState
 	{
 		// lol
 		private var player:Player;
@@ -46,7 +45,7 @@ package example
 			//playSong();
 			
 			// Get a reference to the global storage mechanism
-			storage = FlixelCollab.getStorage() ;
+			storage = FlixelCollab.getStorage();
 			
 			// Set our sub-folder to be "PlatformerExampleGame"
 			// (All values read/written will be private to this storage folder.)
@@ -114,12 +113,6 @@ package example
 			FlxU.collide (enemies, map) ;
 			
 			FlxU.collide (player, enemies) ;
-			
-			if (FlxG.keys.justPressed ("ESCAPE"))
-			{
-				FlxG.state = new PlatformerTitleState ;
-				saveGame() ;
-			}
 		}
 		
 		
@@ -158,7 +151,7 @@ package example
 			
 			// Save our game
 			gameData.saveTracked() ;
-			storage.writeGameData (gameData) ;			
+			storage.writeGameData (gameData) ;
 		}
 		
 		private function getCollisionStatus (x:int, y:int, w:int, h:int):Boolean
@@ -212,14 +205,15 @@ package example
 		
 		
 		// THIS FUNCTION MUST BE DEFINED AND CALLED BEFORE SWITCHING STATES!!!
-		public function unload():void
+		override public function destroy():void
 		{
+			saveGame() ;
+			
+			super.destroy();
+			
 			modProcessor.stop();
 			modProcessor.song = null;
 			modProcessor = null;
-			
-			map = null;
-			player = null;
 		}
 	}
 }

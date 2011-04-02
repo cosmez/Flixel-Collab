@@ -17,23 +17,12 @@ package org.flixel.data
 		}
 		
 		/**
-		 * Updates and/or animates this special effect
+		 * Animates this special effect
 		 */
-		override public function update():void
+		override public function render():void
 		{
-			// if (!inProgress)
-			// {
-			// 	   final state of anim
-			// }
-			// else
-			// {
-			
-			if(alpha >= 1)
-			{
-				finish();
-				alpha = 1;
-			}
-			alpha += FlxG.elapsed / _duration; // this used to be above the if
+			alpha = _progress / _duration;
+			super.render();
 		}
 		
 		

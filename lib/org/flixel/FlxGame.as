@@ -58,7 +58,8 @@ package org.flixel
 		internal var _created:Boolean;
 		
 		//basic display stuff
-		internal var _state:FlxState;
+		public var _state:FlxState;
+		internal var _nextState:FlxState; // added for flixel collab
 		internal var _screen:Sprite;
 		internal var _buffer:Bitmap;
 		internal var _zoom:uint;
@@ -188,6 +189,7 @@ package org.flixel
 			
 			//Finally, create the new state
 			_state.create();
+			_nextState = null;
 		}
 
 		/**
@@ -402,6 +404,9 @@ package org.flixel
 			_console.mtrRender.add(getTimer()-updateMark);
 			//clear mouse wheel delta
 			FlxG.mouse.wheel = 0;
+			
+			// Better state switching! (Courtesy of Flixel Collab)
+			if (_nextState != null) switchState(_nextState);
 		}
 		
 		/**

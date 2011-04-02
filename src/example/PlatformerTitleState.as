@@ -1,8 +1,5 @@
 package example
 {
-	// We need IUnloadable so we always have unload() defined!
-	import collab.IUnloadable;
-	
 	// Game save stuff from Collab
 	import collab.storage.GameStorage ;
 	
@@ -20,7 +17,7 @@ package example
 	 * 
 	 * @author David Grace
 	 */
-	public class PlatformerTitleState extends FlxState implements IUnloadable 
+	public class PlatformerTitleState extends FlxState
 	{
 		private var _storage:GameStorage ;
 		
@@ -110,8 +107,10 @@ package example
 			FlxG.state = new PlatformerPlayState ;
 		}
 		
-		public function unload():void
+		override public function destroy():void
 		{
+			super.destroy();
+			
 			_storage = null ;
 		}
 	}
