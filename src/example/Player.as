@@ -2,7 +2,7 @@ package example
 {
 	import org.flixel.*;
 	
-	// Yoooo
+	// Yooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
 	public class Player extends FlxSprite
 	{
 		// 
@@ -44,14 +44,6 @@ package example
 			play("idle");
 			
 			super.updateMotion();
-		}
-		
-		
-		
-		// THIS FUNCTION MUST BE DEFINED AND CALLED BEFORE SWITCHING STATES!!!
-		public function unload():void
-		{
-			
 		}
 	}
 }

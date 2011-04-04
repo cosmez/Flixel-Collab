@@ -8,12 +8,17 @@ package collab
 	import neoart.flod.*;
 	import flash.utils.ByteArray;
 	
-	// The games themselves!
+	// Your game state here!
 	import example.PlatformerTitleState;
 	
 	
 	
-	// The GameSelectState is where the game starts at!
+	/**
+	 * The GameSelectState is basically the title screen where all games are selected from.
+	 * If you want to add your game to it, replace one of the games[x] lines at the top of the
+	 * create() function with one that has inf for your game! (Look at games[4] to see how the
+	 * example game was added)
+	 */
 	public class GameSelectState extends FlxState
 	{
 		// Variables
@@ -140,7 +145,7 @@ package collab
 			updateSelectedGame();
 			
 			// Fade in from black.
-			FlxG.flash.start(0xff000000, 0.6, null, true);
+			FlxG.flash.start(FlixelCollab.BLACK, 0.6, null, true);
 			
 			// Music!
 			modProcessor = new ModProcessor();
@@ -251,11 +256,12 @@ package collab
 		
 		
 		
+		// Fades out the screen and the music, then switches the state to the selected game!
 		private function startGame():void
 		{
 			if (selectedGame.gameClass == null) return;
 			
-			FlxG.fade.start(0xff000000, 0.6, null, true); // Can't do a fade in the final one
+			FlxG.fade.start(FlixelCollab.BLACK, 0.6, null, true); // Can't do a fade in the final one
 			TweenMax.to(this, 0.6, { songVolume: 0.0, onUpdate: updateSongVolume, onComplete: function():void{ if (selectedGame.gameClass != null) FlxG.state = new selectedGame.gameClass(); } } );
 			selectorSprite.innerSpeed *= 8;
 			selectorSprite.outerSpeed *= 2;

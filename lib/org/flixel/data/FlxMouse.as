@@ -62,7 +62,7 @@ package org.flixel.data
 			screenY = 0;
 			_current = 0;
 			_last = 0;
-			cursor = null;
+			load(null);
 			_out = false;
 		}
 		

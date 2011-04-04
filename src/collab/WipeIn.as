@@ -3,7 +3,7 @@ package collab
 	import flash.geom.Rectangle;
 	import org.flixel.*;
 	
-	// Replaces FlxFlash
+	// A simple screen transition class that replaces flixel's default flash.
 	public class WipeIn extends FlxTransition
 	{
 		public static const TOP_TO_BOTTOM:uint = 0;

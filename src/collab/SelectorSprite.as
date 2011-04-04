@@ -3,6 +3,9 @@ package collab
 	import flash.geom.Rectangle;
 	import org.flixel.*;
 	
+	
+	
+	// Cool little animated selector that GameSelectState uses.
 	public class SelectorSprite extends FlxObject
 	{
 		public var innerSegmentsCount:uint = 8;
@@ -31,8 +34,8 @@ package collab
 		{
 			super(x, y, Width, Height);
 			//thickness = Thickness;
-			innerColor = FlixelCollab.ARNE_PALETTE_ORANGE;
-			flashingColor = FlixelCollab.ARNE_PALETTE_PALE_YELLOW;
+			innerColor = FlixelCollab.ORANGE;
+			flashingColor = FlixelCollab.PALE_YELLOW;
 			outerColor = innerColor;
 		}
 		

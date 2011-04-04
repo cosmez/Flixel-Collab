@@ -1,5 +1,6 @@
 package example
 {
+	// Holds all the graphic / sound / map data assets this game uses.
 	public class Resources
 	{
 		[Embed(source = "assets/gfx/cowboy.png")] public static const GFX_COWBOY :Class;

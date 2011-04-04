@@ -72,9 +72,9 @@ package example
 			
 			// Always start with New Game selected
 			SelectorButton.select (this.defaultGroup, newGameSelector) ;
-			
-			FlxG.mouse.show() ;
 		}
+		
+		
 		
 		override public function update():void
 		{
@@ -83,6 +83,8 @@ package example
 			// Handle the functionality of all the existing selector buttons
 			SelectorButton.updateButtons(this.defaultGroup) ;
 		}
+		
+		
 		
 		private function onNewGame():void
 		{
@@ -107,6 +109,13 @@ package example
 			FlxG.state = new PlatformerPlayState ;
 		}
 		
+		
+		
+		/*
+		 * Override this function to delete your objects!
+		 * Calling super.destroy() will delete everything that was add()'d to this state,
+		 * but anything else you will have to set to null by yourself.
+		 */
 		override public function destroy():void
 		{
 			super.destroy();

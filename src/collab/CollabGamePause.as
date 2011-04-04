@@ -5,7 +5,10 @@ package collab
 	import com.greensock.*;
 	import com.greensock.easing.*;
 	
-	public class CollabPause extends FlxGroup
+	
+	
+	// This class is the pause menu that appears in-game.
+	public class CollabGamePause extends FlxGroup
 	{
 		private var continueText:FlxText;
 		private var quitText:FlxText;
@@ -19,7 +22,7 @@ package collab
 		
 		
 		
-		public function CollabPause()
+		public function CollabGamePause()
 		{
 			super();
 			
@@ -175,7 +178,7 @@ package collab
 		private function quitGame():void
 		{
 			FlxG.pausingEnabled = false;
-			fadeWipe.start(FlixelCollab.ARNE_PALETTE_BLACK, 0.6, function():void{ FlxG.state = new GameSelectState(); } );
+			fadeWipe.start(FlixelCollab.BLACK, 0.6, function():void{ FlxG.state = new GameSelectState(); } );
 			
 			FlxG.play(Resources.SFX_CONFIRM);
 			transitioning = true;

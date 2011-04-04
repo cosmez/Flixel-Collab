@@ -3,6 +3,7 @@ package collab
 	import flash.geom.Rectangle;
 	import org.flixel.*;
 	
+	// A simple screen transition class that replaces flixel's default fade.
 	public class WipeOut extends FlxTransition
 	{
 		public static const TOP_TO_BOTTOM:uint = 0;

@@ -207,9 +207,5 @@ package collab.ui
 			}
 			return (buttons) ;
 		}
-		
-		
-		
 	}
-
 }

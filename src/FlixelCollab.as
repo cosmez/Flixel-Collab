@@ -1,54 +1,65 @@
 ﻿package 
 {
-	import example.PlatformerPlayState;
+	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
+    [Frame(factoryClass = "Preloader")]
+	
+	import example.PlatformerPlayState; // Starting state
+	
 	import org.flixel.*;
 	import collab.*;
 	import collab.storage.GameStorage;
 
-	[SWF(width = "640", height = "480", backgroundColor = "#000000")]
-    [Frame(factoryClass="Preloader")]
+	
 
     public class FlixelCollab extends FlxGame
     {
-		private static const startingState:Class = PlatformerPlayState; // Change "GameSelectState" to be the Class of your game's FlxState!
-																	// (try example.PlatformerPlayState)
+		/**
+		 * The class that starts up first when the game is compiled. Goes to game
+		 * select screen by default. Set it to your game class to shortcut past it!
+		 */
+		private static const startingState:Class = GameSelectState; // Change GameSelectState to be your game's FlxState class!
+																	// (e.g, try example.PlatformerPlayState)
 		
-		public static const ARNE_PALETTE_0:uint  = FlxU.getColor(  0,   0,   0); // BLACK;
-		public static const ARNE_PALETTE_1:uint  = FlxU.getColor(157, 157, 157); // GREY
-		public static const ARNE_PALETTE_2:uint  = FlxU.getColor(255, 255, 255); // WHITE
-		public static const ARNE_PALETTE_3:uint  = FlxU.getColor(190,  38,  51); // RED
-		public static const ARNE_PALETTE_4:uint  = FlxU.getColor(224, 111, 139); // PINK
-		public static const ARNE_PALETTE_5:uint  = FlxU.getColor( 73,  60,  43); // DARK BROWN
-		public static const ARNE_PALETTE_6:uint  = FlxU.getColor(164, 100,  34); // BROWN
-		public static const ARNE_PALETTE_7:uint  = FlxU.getColor(235, 137,  49); // ORANGE
-		public static const ARNE_PALETTE_8:uint  = FlxU.getColor(247, 226, 107); // PALE YELLOW
-		public static const ARNE_PALETTE_9:uint  = FlxU.getColor( 47,  72,  78); // TEAL
-		public static const ARNE_PALETTE_10:uint = FlxU.getColor( 68, 137,  26); // GREEN
-		public static const ARNE_PALETTE_11:uint = FlxU.getColor(163, 206,  39); // LIGHT GREEN
-		public static const ARNE_PALETTE_12:uint = FlxU.getColor( 27,  38,  50); // DARK BLUE
-		public static const ARNE_PALETTE_13:uint = FlxU.getColor(  0,  87, 132); // BLUE
-		public static const ARNE_PALETTE_14:uint = FlxU.getColor( 49, 162, 242); // LIGHT BLUE
-		public static const ARNE_PALETTE_15:uint = FlxU.getColor(178, 220, 239); // PALE BLUE
 		
-		public static const ARNE_PALETTE_BLACK:uint  	  = ARNE_PALETTE_0;
-		public static const ARNE_PALETTE_GREY:uint  	  = ARNE_PALETTE_1;
-		public static const ARNE_PALETTE_WHITE:uint  	  = ARNE_PALETTE_2;
-		public static const ARNE_PALETTE_RED:uint  		  = ARNE_PALETTE_3;
-		public static const ARNE_PALETTE_PINK:uint  	  = ARNE_PALETTE_4;
-		public static const ARNE_PALETTE_DARK_BROWN:uint  = ARNE_PALETTE_5;
-		public static const ARNE_PALETTE_BROWN:uint  	  = ARNE_PALETTE_6;
-		public static const ARNE_PALETTE_ORANGE:uint	  = ARNE_PALETTE_7;
-		public static const ARNE_PALETTE_PALE_YELLOW:uint = ARNE_PALETTE_8;
-		public static const ARNE_PALETTE_TEAL:uint  	  = ARNE_PALETTE_9;
-		public static const ARNE_PALETTE_GREEN:uint 	  = ARNE_PALETTE_10;
-		public static const ARNE_PALETTE_LIGHT_GREEN:uint = ARNE_PALETTE_11;
-		public static const ARNE_PALETTE_DARK_BLUE:uint   = ARNE_PALETTE_12;
-		public static const ARNE_PALETTE_BLUE:uint 		  = ARNE_PALETTE_13;
-		public static const ARNE_PALETTE_LIGHT_BLUE:uint  = ARNE_PALETTE_14;
-		public static const ARNE_PALETTE_PALE_BLUE:uint   = ARNE_PALETTE_15;
-			
-		private static var fadeWipe:FlxTransition;
+		// Color Palette
+		public static const BLACK:uint 		 = FlxU.getColor(  0,   0,   0);
+		public static const GREY:uint 		 = FlxU.getColor(157, 157, 157);
+		public static const WHITE:uint 		 = FlxU.getColor(255, 255, 255);
+		public static const RED:uint 		 = FlxU.getColor(190,  38,  51);
+		public static const PINK:uint 		 = FlxU.getColor(224, 111, 139);
+		public static const DARK_BROWN:uint  = FlxU.getColor( 73,  60,  43);
+		public static const BROWN:uint 		 = FlxU.getColor(164, 100,  34);
+		public static const ORANGE:uint		 = FlxU.getColor(235, 137,  49);
+		public static const PALE_YELLOW:uint = FlxU.getColor(247, 226, 107);
+		public static const TEAL:uint  	     = FlxU.getColor( 47,  72,  78);
+		public static const GREEN:uint 	     = FlxU.getColor( 68, 137,  26);
+		public static const LIGHT_GREEN:uint = FlxU.getColor(163, 206,  39);
+		public static const DARK_BLUE:uint   = FlxU.getColor( 27,  38,  50);
+		public static const BLUE:uint 		 = FlxU.getColor(  0,  87, 132);
+		public static const LIGHT_BLUE:uint  = FlxU.getColor( 49, 162, 242);
+		public static const PALE_BLUE:uint   = FlxU.getColor(178, 220, 239);
+		
+		public static const PAL_0:uint  = BLACK;
+		public static const PAL_1:uint  = GREY;
+		public static const PAL_2:uint  = WHITE;
+		public static const PAL_3:uint  = RED;
+		public static const PAL_4:uint  = PINK;
+		public static const PAL_5:uint  = DARK_BROWN;
+		public static const PAL_6:uint  = BROWN;
+		public static const PAL_7:uint  = ORANGE;
+		public static const PAL_8:uint  = PALE_YELLOW;
+		public static const PAL_9:uint  = TEAL;
+		public static const PAL_10:uint = GREEN;
+		public static const PAL_11:uint = LIGHT_GREEN;
+		public static const PAL_12:uint = DARK_BLUE;
+		public static const PAL_13:uint = BLUE;
+		public static const PAL_14:uint = LIGHT_BLUE;
+		public static const PAL_15:uint = PALE_BLUE;
+		
+		
+		
 		private static var flashWipe:FlxTransition;
+		private static var fadeWipe:FlxTransition;
 		private static var altPause:FlxGroup;
 		
 		/**
@@ -68,22 +79,20 @@
 			// Make the game have 400x300 resolution at regular 2x pixel zoom. Start the game in PlayState.
 			super(320, 240, startingState, 2);
 			
-			// gotta do this to instantiate the mouse graphic.
-			FlxG.mouse.show();
-			FlxG.mouse.hide();
-			
 			// Set the default screen transitions (ones used ingame) to be different (no partial transparency!)
-			FlxG.fade = new WipeOut();
 			FlxG.flash = new WipeIn();
+			FlxG.fade = new WipeOut();
 			
-			// Set up our custom fade/flash.
-			fadeWipe = new WipeOut();
+			// Set up our custom flash/fade.
 			flashWipe = new WipeIn();
+			fadeWipe = new WipeOut();
 			
-			pause = new CollabPause();
+			// Set up our custom pause menus.
+			pause = new CollabGamePause();
 			altPause = new GameSelectPause();
 			
-			if (startingState == GameSelectState)
+			// Shortcut to gamestate if set.
+			if (_state as GameSelectState != null)
 			{
 				swapTransitions();
 				swapPauses();
@@ -95,23 +104,39 @@
 		
 		
 		
+		/**
+		 * Call this to get the current instiated storage system.  GameStorage has all you need for saving/loading
+		 * games, setting persistent data values, serializing states, etc.
+		 * 
+		 * @return	Instance of our storage system.
+		 */
+		static public function getStorage():GameStorage { return _storage; }
+		
+		
+		
 		override public function switchState(State:FlxState):void
 		{
+			// Do special stuff if transitioning to or from Game Select State.
 			if (_state as GameSelectState != null)
 			{
 				FlxG.mouse.hide();
-			
+				
 				FlxG.unpauseOnFocus = false;
-			
+				
+				flashWipe = new WipeIn();
+				fadeWipe = new WipeOut();
+				
 				swapTransitions();
 				swapPauses();
 			}
 			else if (State as GameSelectState != null)
 			{
+				if (!altPause.active) { FlxG.log("ERROR: ONLY PAUSE MENU CAN SWITCH BACK TO GAME SELECT STATE."); return; }
+				
 				FlxG.pausingEnabled = true;
 				FlxG.unpauseOnFocus = true;
 				FlxG.pause = false;
-			
+				
 				swapTransitions();
 				swapPauses();
 			}
@@ -121,6 +146,9 @@
 		
 		
 		
+		/**
+		 * Internal FlixelCollab function. Don't call this!
+		 */
 		public static function swapTransitions():void
 		{
 			var swapTransition:FlxTransition = FlxG.fade;
@@ -132,27 +160,14 @@
 			flashWipe = swapTransition;
 		}
 		
-		
-		
+		/**
+		 * Internal FlixelCollab function. Don't call this!
+		 */
 		public static function swapPauses():void
 		{
-			// swap pause!
 			var swapPause:FlxGroup = pause;
 			pause = altPause;
 			altPause = swapPause;
-		}
-		
-		
-		
-		/**
-		 * Call this to get the current instiated storage system.  GameStorage has all you need for saving/loading
-		 * games, setting persistent data values, serializing states, etc.
-		 * 
-		 * @return	Instance of our storage system.
-		 */
-		static public function getStorage():GameStorage
-		{
-			return _storage; //(FlxG.game as FlixelCollab).storage;
 		}
     }
 }

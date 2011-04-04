@@ -1,5 +1,9 @@
 package collab
 {
+	/**
+	 * This class is a simple information holder for all the important info about
+	 * a FlixelCollab game (its name, description, starting state, etc).
+	 */
 	public class CollabGameInfo
 	{
 		public var name:String;

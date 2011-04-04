@@ -1,8 +1,11 @@
 package collab
 {
+	// A simple class that holds all the graphics and sounds used by GameSelectState.
+	// If you want to see how your game will show up in the GameSelectState, embed your
+	// preview files in here and modify GameSelectState to use them.
 	public class Resources
 	{
-		// The FA devs stuff.
+		// The devs stuff.
 		[Embed(source = "gfx/no_icon.png")] public static const GFX_NO_GAME_ICON :Class;
 		[Embed(source = "gfx/no_preview.png")] public static const GFX_NO_GAME_PREVIEW :Class;
 		
@@ -31,8 +34,6 @@ package collab
 		//[Embed(source = '../chainedlupine/Game Icon.png')]	public static const GFX_GAME3_ICON: Class ;
 		//[Embed(source = '../chainedlupine/Game Preview.png')]	public static const GFX_GAME3_PREVIEW1:Class ;
 		
-		
-		
 		[Embed(source = "fonts/deltaforce_blue_outline_font.png")] public static const GFX_TITLE_FONT :Class;
 		
 		
@@ -54,8 +55,5 @@ package collab
 		[Embed(source="../../lib/org/flixel/data/key_plus.png")] public static const ImgKeyPlus:Class;
 		[Embed(source="../../lib/org/flixel/data/key_0.png")] public static const ImgKey0:Class;
 		[Embed(source="../../lib/org/flixel/data/key_p.png")] public static const ImgKeyP:Class;
-		
-		
-		
 	}
 }
