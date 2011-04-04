@@ -34,6 +34,10 @@ package org.flixel
 		
 		
 		
+		/**
+		 * Refreshes the node graph for this FlxPathfinding instance to match the map
+		 * data for a tilemap.
+		 */ 
 		public function buildNodeGraph(tilemap:FlxTilemap):void
 		{
 			_map = tilemap;
@@ -61,11 +65,19 @@ package org.flixel
 		}
 		
 		
-		
-		// Given a start and end point, returns an array of points representing the shortest path (if any) between them.
-		// 
-		public function findPath(startPoint:Point, endPoint:Point, maxLength:uint = 0, maxCost:uint = 0, allowDiagonalMovement:Boolean = false, ignoreWalls:Boolean = false, acceptClosestBroken:Boolean = false):Vector.<Point>
+		/**
+		 * Given a start and end point, returns an array of points representing the shortest path (if any) between them.
+		 * @param	startPoint					The point you want to start on.
+		 * @param	endPoint					The point you want to end at.
+		 * @param	maxLength					The maximum allowed number of points in this path.
+		 * @param	allowDiagonalMovement		Whether or not diagonal movement is allowed.
+		 * @param	ignoreWalls					Whether or not the path can cross collideable tiles.
+		 * @param	acceptClosestBroken			If true, it will return the best guess in the case that no path can be found.
+		 */ 
+		public function findPath(startPoint:Point, endPoint:Point, maxLength:uint = 0, allowDiagonalMovement:Boolean = false, ignoreWalls:Boolean = false, acceptClosestBroken:Boolean = false):Vector.<Point>
 		{
+			var maxCost:uint = 0; // this will eventually be a param for the function!
+			
 			// Make sure the start and end points are different.
 			if (_nodes == null || (startPoint.x == endPoint.x && startPoint.y == endPoint.y)) return null;
 			

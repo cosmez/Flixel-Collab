@@ -957,10 +957,21 @@ package org.flixel
 		
 		
 		
-		public function findPath(startTileX:int, startTileY:int, endTileX:int, endTileY:int, maxLength:uint = 0, maxCost:uint = 0, allowDiagonalMovement:Boolean = true, ignoreWalls:Boolean = false, acceptClosestBroken:Boolean = false):Vector.<Point>
+		/**
+		 * Given a start and end point, returns an array of points representing the shortest path (if any) between them.
+		 * @param	startTileX					The X coordinate of the tile the path starts at.
+		 * @param	startTileY					The Y coordinate of the tile the path starts at.
+		 * @param	endTileX					The X coordinate of the tile the path should end at.
+		 * @param	endTileY					The Y coordinate of the tile the path should end at.
+		 * @param	maxLength					The maximum allowed number of points in this path.
+		 * @param	allowDiagonalMovement		Whether or not diagonal movement is allowed.
+		 * @param	ignoreWalls					Whether or not the path can cross collideable tiles.
+		 * @param	acceptClosestBroken			If true, it will return the best guess in the case that no path can be found.
+		 */ 
+		public function findPath(startTileX:int, startTileY:int, endTileX:int, endTileY:int, maxLength:uint = 0, allowDiagonalMovement:Boolean = true, ignoreWalls:Boolean = false, acceptClosestBroken:Boolean = false):Vector.<Point>
 		{
 			if (pathFinder == null) pathFinder = new FlxPathfinding(this);
-			return pathFinder.findPath(new Point(startTileX, startTileY), new Point(endTileX, endTileY), maxLength, maxCost, allowDiagonalMovement, ignoreWalls, acceptClosestBroken);
+			return pathFinder.findPath(new Point(startTileX, startTileY), new Point(endTileX, endTileY), maxLength, allowDiagonalMovement, ignoreWalls, acceptClosestBroken);
 		}
 	}
 }
